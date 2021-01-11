@@ -1,14 +1,14 @@
 
 
 # 1. Get File
-#   a. log in to ftp or scrape to get download link
-#       - maybe scrape to get some files. We'll see. 
+#   a. log in to ftp or scrape to get download link 
 #   b. determine which program to download (maybe by modified date)
 #   c. Download file
 
+# ???: start here. Process files from a "dump" folder.
 # 2. process file
 #   a. create mp3 version of promo
-#       - lame.exe?
+#       - ***lame.exe?
 #       - mutagen?
 #   b. rename .wav for ingest into DAD
 #       - cut number
