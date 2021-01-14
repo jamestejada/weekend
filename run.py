@@ -27,12 +27,35 @@ from modules.ftp import connect
 from modules.choose import Chooser
 from datetime import datetime, timedelta
 
+dir_list = [
+    'LatinoUS',
+    'RevealWk',
+    'SaysYou1',
+    'SnapJudg',
+    'THEMOTH',
+    'ThisAmer'
+]
+
+
 
 def main():
     prx_server = connect()
-    file_info_generator = prx_server.mlsd('/RevealWk')
 
-    chooser = Chooser(file_info_generator, which_file_set='old')
+    for directory in dir_list:
+        process_dir(prx_server, directory)
+
+    prx_server.close()
+
+
+
+def process_dir(prx_server, directory):
+    
+    print(f'---------{directory}---------')
+    which_file_set = 'old' if directory == 'RevealWk' else 'latest'
+
+    file_info_generator = prx_server.mlsd(f'/{directory}')
+
+    chooser = Chooser(file_info_generator, which_file_set=which_file_set)
 
     files_only = chooser.all_files
     print(files_only)
@@ -40,7 +63,6 @@ def main():
     files_to_get = chooser.files_to_get()
     print(files_to_get)
 
-    prx_server.close()
 
 if __name__ == '__main__':
     main()

@@ -28,11 +28,12 @@ class Chooser:
         files_only = files_only_list or self.all_files
         full_file_dict = self._merge_dicts(files_only)
 
-        past_limit_date = self._get_day_limit()
+        sunday = self._get_day_limit()
+        saturday = sunday + timedelta(weeks=1)
 
         return [
             (file_name, modified_date) for file_name, modified_date in full_file_dict.items()
-            if (lower_limit < (self.today - datetime.strptime(modified_date, '%Y%m%d%H%M%S')) < upper_limit)
+            if (sunday < datetime.strptime(modified_date, '%Y%m%d%H%M%S') < saturday)
             ]
 
     def _get_day_limit(self, which_file_set=None):
