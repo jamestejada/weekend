@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+
 class Chooser:
     """ Base class for selecting which files to download from FTP
     """
@@ -32,13 +33,11 @@ class Chooser:
         saturday = sunday + timedelta(weeks=1)
 
         return [
-            (file_name, modified_date) for file_name, modified_date in full_file_dict.items()
+            file_name for file_name, modified_date in full_file_dict.items()
             if (sunday < datetime.strptime(modified_date, '%Y%m%d%H%M%S') < saturday)
             ]
 
     def _get_day_limit(self, which_file_set=None):
-        # have to change this when we go to specific dates.
-
         this_week = self.today - timedelta(days=self.weekday)
         last_week = self.today - timedelta(days=(7 + self.weekday))
 

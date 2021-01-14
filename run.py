@@ -25,6 +25,8 @@
 
 from modules.ftp import connect
 from modules.choose import Chooser
+from modules.download import Download_Files
+from modules.settings import LOCAL_PATH
 from datetime import datetime, timedelta
 
 dir_list = [
@@ -57,11 +59,14 @@ def process_dir(prx_server, directory):
 
     chooser = Chooser(file_info_generator, which_file_set=which_file_set)
 
-    files_only = chooser.all_files
-    print(files_only)
+    # files_only = chooser.all_files
+    # print(files_only)
 
     files_to_get = chooser.files_to_get()
-    print(files_to_get)
+    # print(files_to_get)
+
+    download_files = Download_Files(prx_server, directory, files_to_get)
+    download_files.download_all()
 
 
 if __name__ == '__main__':
