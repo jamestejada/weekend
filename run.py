@@ -32,7 +32,7 @@ def main():
     prx_server = connect()
     file_info_generator = prx_server.mlsd('/RevealWk')
 
-    chooser = Chooser(file_info_generator)
+    chooser = Chooser(file_info_generator, which_file_set='old')
 
     files_only = chooser.all_files
     print(files_only)
