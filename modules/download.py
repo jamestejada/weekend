@@ -17,11 +17,11 @@ class Download_Files:
     def download_one(self, one_file):
         full_path = self.LOCAL_PATH.joinpath(one_file)
         with open(full_path, 'wb') as out_file:
-            print(f'Downloading {one_file} ... ', end='')
+            print(f'Downloading {one_file} ... ', end='\r')
             result = self.server.retrbinary(
                 f'RETR /{self.remote_dir}/{one_file}', out_file.write
                 )
-            print(result)
+            print(f'Downloading {one_file} ... ', 'SUCCESS' if ('226' in result) else 'FAILED')
             return ('226' in result)
 
 

@@ -26,7 +26,7 @@
 from modules.ftp import connect
 from modules.choose import Chooser
 from modules.download import Download_Files
-from modules.settings import LOCAL_PATH
+from modules.settings import LOCAL_PATH, PROCESS_ONLY
 from datetime import datetime, timedelta
 
 
@@ -44,14 +44,19 @@ dir_list = [
 
 
 def main():
+    prx_server = None
+
+    if not PROCESS_ONLY:
+        prx_server = connect()
+
+        for directory in dir_list:
+            process_dir(prx_server, directory)
+
     show = Reveal()
-    print(show.file_list)
-    # prx_server = connect()
+    print(show)
 
-    # for directory in dir_list:
-    #     process_dir(prx_server, directory)
-
-    # prx_server.close()
+    if prx_server:
+        prx_server.close()
 
 
 
