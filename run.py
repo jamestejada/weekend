@@ -29,6 +29,9 @@ from modules.download import Download_Files
 from modules.settings import LOCAL_PATH
 from datetime import datetime, timedelta
 
+
+from modules.process import Reveal
+
 dir_list = [
     'LatinoUS',
     'RevealWk',
@@ -41,12 +44,14 @@ dir_list = [
 
 
 def main():
-    prx_server = connect()
+    show = Reveal()
+    print(show.file_list)
+    # prx_server = connect()
 
-    for directory in dir_list:
-        process_dir(prx_server, directory)
+    # for directory in dir_list:
+    #     process_dir(prx_server, directory)
 
-    prx_server.close()
+    # prx_server.close()
 
 
 

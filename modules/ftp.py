@@ -13,7 +13,6 @@ def connect(n=1):
     if '230' in result:
         print('--------FTP CONNECTED--------')
         print(result)
-        print(server.getwelcome())
         return server
     else:
         # does this interfere with linear backoff....?
