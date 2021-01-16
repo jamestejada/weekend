@@ -23,6 +23,8 @@ class PRX:
 
 
 LOCAL_PATH = from_cwd('downloads')
+FOR_DROPBOX = from_cwd('for_dropbox')
+FOR_FFA = from_cwd('for_ffa')
 
 PROCESS_ONLY = check_flags(['process_only', 'process'])
 

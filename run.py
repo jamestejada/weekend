@@ -54,6 +54,8 @@ def main():
 
     show = Reveal()
     print(show)
+    show.process()
+    print(show.destination_paths)
 
     if prx_server:
         prx_server.close()
