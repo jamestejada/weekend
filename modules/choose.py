@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 
 class Chooser:
-    """ Base class for selecting which files to download from FTP
+    """ class for selecting which files to download from FTP
     """
 
     def __init__(self, file_info_generator, which_file_set='latest'):
