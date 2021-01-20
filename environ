@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ ! -d "venv" ]; then
+    echo Virtual Environment not found. Creating...;
+    /usr/bin/python3 -m venv venv;
+    echo DONE;
+fi
+
+source "$(pwd)/venv/bin/activate";
