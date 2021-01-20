@@ -1,8 +1,7 @@
+import os
 import shutil
+import subprocess
 from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA
-
-# List of classes for each program
-
 
 
 class Reveal:
@@ -35,7 +34,6 @@ class Reveal:
     def __init__(self):
         self.show_string = str(self.__class__.__name__).replace('_', ' ')
         self.file_list = self.get_file_list()
-        print(self.file_list)
         self.source_paths = self.get_source_paths()
         self.destination_paths = self.get_destination_paths()
     
@@ -47,7 +45,9 @@ class Reveal:
         # add date info to title.
         for segment_name in self.CUT_NUMBERS.keys():
             source_file = self.source_paths.get(segment_name)
-            if source_file.exists():
+            destination_file = self.destination_paths.get(segment_name)
+            if source_file and source_file.exists():
+                print(f'Writing {source_file.name} to {destination_file.parent.stem}')
                 shutil.copy(
                     str(source_file),
                     str(self.destination_paths.get(segment_name))
@@ -57,12 +57,30 @@ class Reveal:
         # use lame?
         # add date informtion to file name
         source_file = self.source_paths.get('promo')
-        ffa_file_name = f'{self.show_string} PROMO{source_file.suffix}'
-        if source_file.exists():
-            shutil.copy(
-                str(source_file),
-                str(self.FOR_FFA.joinpath(ffa_file_name))
-            )
+        if source_file and source_file.exists():
+            if os.name == 'nt':
+                ffa_path = self.FOR_FFA.joinpath(
+                    f'{self.show_string} PROMO{source_file.suffix}'
+                    )
+                print(f'Writing {ffa_path.name} to {ffa_path.parent.stem}')
+                shutil.copy(
+                    str(source_file),
+                    str(ffa_path)
+                )
+            else:
+                ffa_path = self.FOR_FFA.joinpath(f'{self.show_string} PROMO.mp3')
+                print(f'Writing {ffa_path.name} to {ffa_path.parent.stem}')
+                subprocess.run([
+                    'ffmpeg', 
+                    '-i', str(source_file), 
+                    '-vn', 
+                    '-ar', '44100', 
+                    '-ac', '2', 
+                    '-b:a', '192k',
+                    '-y',
+                    str(ffa_path)
+                    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                # ffmpeg -i input-file.wav -vn -ar 44100 -ac 2 -b:a 192k output-file.mp3
 
     def get_destination_paths(self):
         return {
