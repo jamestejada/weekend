@@ -73,12 +73,14 @@ class Reveal:
 
         if source and source.exists():
             self._message(destination)
-            
+            conversion_func = self.normalize if os.name == 'nt' else self.convert_to_mp3
+            conversion_func(source, destination)
 
-            if os.name == 'nt':
-                self.normalize(source, destination)
-            else:
-                self.convert_to_mp3(source, destination)
+            # should I keep it the way below for readability?
+            # if os.name == 'nt':
+            #     self.normalize(source, destination)
+            # else:
+            #     self.convert_to_mp3(source, destination)
     
     def _message(self, destination_path):
         print(f'Writing "{destination_path.name}" to "{destination_path.parent.stem}"')
