@@ -2,7 +2,7 @@ import os
 import shutil
 import subprocess
 from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA
-
+from ffmpeg_normalize import FFmpegNormalize
 
 class Reveal:
     NUMBER_OF_SHOW_FILES = 9
@@ -31,11 +31,16 @@ class Reveal:
     FOR_DROPBOX = FOR_DROPBOX
     FOR_FFA = FOR_FFA
     
-    def __init__(self):
+    def __init__(self, sample_rate=44100, target_level=-24.0, true_peak=-3.0, bitrate='256k'):
         self.show_string = str(self.__class__.__name__).replace('_', ' ')
         self.file_list = self.get_file_list()
         self.source_paths = self.get_source_paths()
         self.destination_paths = self.get_destination_paths()
+
+        self.target_level = target_level
+        self.sample_rate = sample_rate
+        self.true_peak = true_peak
+        self.bitrate = bitrate
     
     def process(self):
         self.process_for_dropbox()
@@ -44,43 +49,47 @@ class Reveal:
     def process_for_dropbox(self):
         # add date info to title.
         for segment_name in self.CUT_NUMBERS.keys():
-            source_file = self.source_paths.get(segment_name)
-            destination_file = self.destination_paths.get(segment_name)
-            if source_file and source_file.exists():
-                print(f'Writing {source_file.name} to {destination_file.parent.stem}')
-                shutil.copy(
-                    str(source_file),
-                    str(self.destination_paths.get(segment_name))
-                )
-    
+            source = self.source_paths.get(segment_name)
+            destination = self.destination_paths.get(segment_name)
+
+            if source and source.exists():
+                self._message(destination)
+                self.normalize(source, destination)
+
+    def normalize(self, source, destination):
+        norm = FFmpegNormalize(
+            target_level=self.target_level,
+            sample_rate=self.sample_rate,
+            true_peak=self.true_peak,
+            video_disable=True
+        )
+        norm.add_media_file(source, destination)
+        norm.run_normalization()
+
     def process_for_ffa(self):
-        # use lame?
-        # add date informtion to file name
-        source_file = self.source_paths.get('promo')
-        if source_file and source_file.exists():
+        source = self.source_paths.get('promo')
+        extension = '.wav' if os.name == 'nt' else '.mp3'
+        destination = self.FOR_FFA.joinpath(f'{self.show_string} PROMO{extension}')
+
+        if source and source.exists():
+            self._message(destination)
+            
+
             if os.name == 'nt':
-                ffa_path = self.FOR_FFA.joinpath(
-                    f'{self.show_string} PROMO{source_file.suffix}'
-                    )
-                print(f'Writing {ffa_path.name} to {ffa_path.parent.stem}')
-                shutil.copy(
-                    str(source_file),
-                    str(ffa_path)
-                )
+                self.normalize(source, destination)
             else:
-                ffa_path = self.FOR_FFA.joinpath(f'{self.show_string} PROMO.mp3')
-                print(f'Writing {ffa_path.name} to {ffa_path.parent.stem}')
-                subprocess.run([
-                    'ffmpeg', 
-                    '-i', str(source_file), 
-                    '-vn', 
-                    '-ar', '44100', 
-                    '-ac', '2', 
-                    '-b:a', '192k',
-                    '-y',
-                    str(ffa_path)
-                    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                # ffmpeg -i input-file.wav -vn -ar 44100 -ac 2 -b:a 192k output-file.mp3
+                self.convert_to_mp3(source, destination)
+    
+    def _message(self, destination_path):
+        print(f'Writing "{destination_path.name}" to "{destination_path.parent.stem}"')
+
+    def convert_to_mp3(self, source, destination):
+        subprocess.run(
+            [
+            'ffmpeg', '-i', str(source), '-vn', '-ar', str(self.sample_rate), 
+            '-ac', '2', '-b:a', self.bitrate, '-y',
+            str(destination)
+            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     def get_destination_paths(self):
         return {
@@ -88,7 +97,7 @@ class Reveal:
             for segment, file_path in self.source_paths.items()
         }
 
-    def get_dropbox_file_name(self, segment_name, extension = '.wav'):
+    def get_dropbox_file_name(self, segment_name, extension='.wav'):
         segment_string = segment_name.replace('_', ' ').upper()
 
         return self.FOR_DROPBOX.joinpath(
