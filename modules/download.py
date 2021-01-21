@@ -16,6 +16,9 @@ class Download_Files:
 
     def download_one(self, one_file):
         full_path = self.LOCAL_PATH.joinpath(one_file)
+        if full_path.exists():
+            return
+
         with open(full_path, 'wb') as out_file:
             print(f'Downloading {one_file}...', end='', flush=True)
             result = self.server.retrbinary(

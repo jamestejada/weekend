@@ -26,5 +26,9 @@ LOCAL_PATH = from_cwd('downloads')
 FOR_DROPBOX = from_cwd('for_dropbox')
 FOR_FFA = from_cwd('for_ffa')
 
+RESET_DIRS = [LOCAL_PATH, FOR_DROPBOX, FOR_FFA]
+
+
 PROCESS_ONLY = check_flags(['process_only', 'process'])
+RESET = check_flags(['reset', 'delete'])
 

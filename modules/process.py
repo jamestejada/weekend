@@ -4,6 +4,8 @@ import subprocess
 from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA
 from ffmpeg_normalize import FFmpegNormalize
 
+
+# Base Class
 class Reveal:
     NUMBER_OF_SHOW_FILES = 9
     SHOW_MATCH = ['RevealWk_']
@@ -52,6 +54,9 @@ class Reveal:
             source = self.source_paths.get(segment_name)
             destination = self.destination_paths.get(segment_name)
 
+            if destination and destination.exists():
+                return
+
             if source and source.exists():
                 self._message(destination)
                 self.normalize(source, destination)
@@ -66,32 +71,32 @@ class Reveal:
         norm.add_media_file(source, destination)
         norm.run_normalization()
 
-    def process_for_ffa(self):
-        source = self.source_paths.get('promo')
+    def process_for_ffa(self, key='promo'):
+        # source is a for_dropbox path to use already normalized files
+        source = self.destination_paths.get(key)
+        key_string = str(key).replace('_', ' ').upper()
         extension = '.wav' if os.name == 'nt' else '.mp3'
         destination = self.FOR_FFA.joinpath(f'{self.show_string} PROMO{extension}')
+
+        if destination.exists():
+            return
 
         if source and source.exists():
             self._message(destination)
             conversion_func = self.normalize if os.name == 'nt' else self.convert_to_mp3
             conversion_func(source, destination)
 
-            # should I keep it the way below for readability?
-            # if os.name == 'nt':
-            #     self.normalize(source, destination)
-            # else:
-            #     self.convert_to_mp3(source, destination)
-    
     def _message(self, destination_path):
         print(f'Writing "{destination_path.name}" to "{destination_path.parent.stem}"')
 
     def convert_to_mp3(self, source, destination):
         subprocess.run(
             [
-            'ffmpeg', '-i', str(source), '-vn', '-ar', str(self.sample_rate), 
-            '-ac', '2', '-b:a', self.bitrate, '-y',
-            str(destination)
-            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                'ffmpeg', '-i', str(source), '-vn', '-ar', str(self.sample_rate),
+                '-ac', '2', '-b:a', self.bitrate, '-y',
+                str(destination)
+            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
 
     def get_destination_paths(self):
         return {
@@ -232,10 +237,39 @@ class Snap_Judgment(Reveal):
     }
 
 
+class This_American_Life(Reveal):
+    SHOW_MATCH = ['ThisAmer_']
+    NUMBER_OF_SHOW_FILES = 5
+    SEGMENT_MATCHES = {
+        'PROM01': 'promo',
+        'PROM02': 'promo_today',
+        'SGMT01': 'segment_a',
+        'SGMT03': 'segment_b',
+        'SGMT02': 'music_bed_a'
+    }
+    CUT_NUMBERS = {
+        'promo': '25321',
+        'segment_a': '17040',
+        'segment_b': '17042',
+        'music_bed_a': '17041'
+    }
+
+
 PROGRAM_LIST = [
     Reveal,
     Latino_USA,
     Says_You,
     The_Moth,
-    Snap_Judgment
+    Snap_Judgment,
+    This_American_Life
 ]
+
+
+def process_all(_program_class_list=None):
+    print('--------PROCESSING--------')
+
+    program_class_list = _program_class_list or PROGRAM_LIST
+    for program_class in program_class_list:
+        show = program_class()
+        print(f'---{show.show_string}---')
+        show.process()

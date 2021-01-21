@@ -25,8 +25,8 @@ class Chooser:
             output_dict.update(each_dict)
         return output_dict
 
-    def files_to_get(self, files_only_list=None):
-        files_only = files_only_list or self.all_files
+    def files_to_get(self):
+        files_only = self.all_files
         full_file_dict = self._merge_dicts(files_only)
 
         sunday = self._get_day_limit()
@@ -45,3 +45,36 @@ class Chooser:
             'latest': this_week,
             'old': last_week
         }.get(which_file_set or self.which_file_set)
+
+
+class Chooser_Snap_Judgment(Chooser):
+    # override
+    def files_to_get(self):
+        files_only = self.all_files
+        full_file_dict = self._merge_dicts(files_only)
+        return [file_name for file_name in full_file_dict.keys()]
+
+class Chooser_TAL(Chooser):
+    # override
+    def _get_day_limit(self, which_file_set=None):
+        return self.today - timedelta(days=self.weekday + 2)
+
+
+CHOOSE_CLASS = {
+    # Matches classes with ftp directory
+    'LatinoUS': Chooser,
+    'RevealWk': Chooser,
+    'SaysYou1': Chooser,
+    'SnapJudg': Chooser_Snap_Judgment,
+    'THEMOTH': Chooser,
+    'ThisAmer': Chooser_TAL
+}
+
+NOT_LATEST = ['RevealWk']
+
+
+def choose_files(ftp_dir, file_info_generator):
+    which_file_set = 'old' if ftp_dir in NOT_LATEST else 'latest'
+
+    chooser = CHOOSE_CLASS.get(ftp_dir)(file_info_generator, which_file_set=which_file_set)
+    return chooser.files_to_get()
