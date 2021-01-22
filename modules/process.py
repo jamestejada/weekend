@@ -3,12 +3,14 @@ import shutil
 import subprocess
 from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA
 from ffmpeg_normalize import FFmpegNormalize
+from datetime import datetime, timedelta
 
 
 # Base Class
 class Reveal:
     NUMBER_OF_SHOW_FILES = 9
     SHOW_MATCH = ['RevealWk_']
+    AIR_DAYS = [4]
     SEGMENT_MATCHES = {
         'PROM01': 'promo',
         'SGMT01': 'billboard',
@@ -35,6 +37,8 @@ class Reveal:
     
     def __init__(self, sample_rate=44100, target_level=-24.0, true_peak=-3.0, bitrate='256k'):
         self.show_string = str(self.__class__.__name__).replace('_', ' ')
+        self.air_days_string = self.get_days_string()
+
         self.file_list = self.get_file_list()
         self.source_paths = self.get_source_paths()
         self.destination_paths = self.get_destination_paths()
@@ -43,7 +47,22 @@ class Reveal:
         self.sample_rate = sample_rate
         self.true_peak = true_peak
         self.bitrate = bitrate
+
     
+    def get_days_string(self):
+        if len(self.AIR_DAYS) == 1:
+            today = datetime.today()
+            monday = today - timedelta(days=today.weekday())
+            air_day = monday + timedelta(days=self.AIR_DAYS[0])
+            return f'{air_day.strftime("%b %-d")}'
+        if len(self.AIR_DAYS) == 2:
+            today = datetime.today()
+            monday = today - timedelta(days=today.weekday())
+            air_day_1 = monday + timedelta(days=self.AIR_DAYS[0])
+            air_day_2 = monday + timedelta(days=self.AIR_DAYS[1])
+
+            return f'{air_day_1.strftime("%b %-d")} and {air_day_2.strftime("%b %-d")}'
+
     def process(self):
         self.process_for_dropbox()
         self.process_for_ffa()
@@ -76,7 +95,9 @@ class Reveal:
         source = self.destination_paths.get(key)
         key_string = str(key).replace('_', ' ').upper()
         extension = '.wav' if os.name == 'nt' else '.mp3'
-        destination = self.FOR_FFA.joinpath(f'{self.show_string} PROMO{extension}')
+        destination = self.FOR_FFA.joinpath(
+            f'{self.show_string} PROMO {self.air_days_string}{extension}'
+            )
 
         if destination.exists():
             return
@@ -108,7 +129,8 @@ class Reveal:
         segment_string = segment_name.replace('_', ' ').upper()
 
         return self.FOR_DROPBOX.joinpath(
-            f'{self.CUT_NUMBERS.get(segment_name)}_{self.show_string} {segment_string}{extension}'
+            f'{self.CUT_NUMBERS.get(segment_name)}_{self.show_string} '
+            + f'{segment_string} {self.air_days_string}{extension}'
             )
     
     def get_file_list(self):
@@ -149,6 +171,7 @@ class Reveal:
 class Latino_USA(Reveal):
     SHOW_MATCH = [str(num) for num in range(35232, 35249)]
     NUMBER_OF_SHOW_FILES = 9
+    AIR_DAYS = [6]
     SEGMENT_MATCHES = {
         '35232': 'promo',
         '35242': 'billboard',
@@ -174,6 +197,7 @@ class Latino_USA(Reveal):
 class Says_You(Reveal):
     SHOW_MATCH = ['SaysYou1_']
     NUMBER_OF_SHOW_FILES = 6
+    AIR_DAYS = [6]
     SEGMENT_MATCHES = {
         'PROM01': 'promo',
         'SGMT01': 'billboard',
@@ -193,6 +217,7 @@ class Says_You(Reveal):
 class The_Moth(Reveal):
     SHOW_MATCH = ['THEMOTH_']
     NUMBER_OF_SHOW_FILES = 7
+    AIR_DAYS = [6]
     SEGMENT_MATCHES = {
         'PROM01': 'promo',
         'SGMT01': 'billboard',
@@ -217,6 +242,7 @@ class The_Moth(Reveal):
 class Snap_Judgment(Reveal):
     SHOW_MATCH =[str(num) for num in range(14155, 14162)]
     NUMBER_OF_SHOW_FILES = 7
+    AIR_DAYS = [6]
     SEGMENT_MATCHES = {
         '14161': 'promo',
         '14155': 'billboard',
@@ -240,6 +266,7 @@ class Snap_Judgment(Reveal):
 class This_American_Life(Reveal):
     SHOW_MATCH = ['ThisAmer_']
     NUMBER_OF_SHOW_FILES = 5
+    AIR_DAYS = [5, 6]
     SEGMENT_MATCHES = {
         'PROM01': 'promo',
         'PROM02': 'promo_today',

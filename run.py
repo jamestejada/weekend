@@ -14,7 +14,7 @@ from modules.process import PROGRAM_LIST
 
 # TO DO: 
 #   DONE - Add 'reset' functionality to delete directories
-#   - Add Air Date to file names
+#   DONE - Add Air Date to file names
 def main():
 
     if RESET:
