@@ -1,3 +1,4 @@
+from colorama import Fore, Style
 import os
 import shutil
 import subprocess
@@ -50,31 +51,40 @@ class Reveal:
 
     
     def get_days_string(self):
-        if len(self.AIR_DAYS) == 1:
-            today = datetime.today()
-            monday = today - timedelta(days=today.weekday())
-            air_day = monday + timedelta(days=self.AIR_DAYS[0])
-            return f'{air_day.strftime("%b %-d")}'
-        if len(self.AIR_DAYS) == 2:
-            today = datetime.today()
-            monday = today - timedelta(days=today.weekday())
-            air_day_1 = monday + timedelta(days=self.AIR_DAYS[0])
-            air_day_2 = monday + timedelta(days=self.AIR_DAYS[1])
+        """returns a string containing formatted air dates
+        of form: 'Jan 24'. This also accounts for two or more
+        air days set in the self.AIR_DAYS(list) class variable.
+        If two or more air dates are given, this method joins
+        them with an 'and.' 
 
-            return f'{air_day_1.strftime("%b %-d")} and {air_day_2.strftime("%b %-d")}'
+        eg. "Jan 23 and Jan 24"
+        """
+        today = datetime.today()
+        monday = today - timedelta(days=today.weekday())
+        air_date_list = [
+            (monday + timedelta(days=day)).strftime('%b %-d')
+            for day in self.AIR_DAYS
+            ]
+        return ' and '.join(air_date_list)
 
     def process(self):
         self.process_for_dropbox()
         self.process_for_ffa()
     
     def process_for_dropbox(self):
-        # add date info to title.
+        """ Prepares files for ENCO Dropbox. This method
+        normalizes and renames files to be ingested into
+        DAD system with specific metadata.
+
+        If a file to be written already exists, it will
+        skip that file. 
+        """
         for segment_name in self.CUT_NUMBERS.keys():
             source = self.source_paths.get(segment_name)
             destination = self.destination_paths.get(segment_name)
 
             if destination and destination.exists():
-                return
+                continue
 
             if source and source.exists():
                 self._message(destination)
@@ -95,9 +105,8 @@ class Reveal:
         source = self.destination_paths.get(key)
         key_string = str(key).replace('_', ' ').upper()
         extension = '.wav' if os.name == 'nt' else '.mp3'
-        destination = self.FOR_FFA.joinpath(
-            f'{self.show_string} PROMO {self.air_days_string}{extension}'
-            )
+        file_name = f'{self.show_string} {key_string} {self.air_days_string}{extension}'
+        destination = self.FOR_FFA.joinpath(file_name)
 
         if destination.exists():
             return
@@ -293,10 +302,11 @@ PROGRAM_LIST = [
 
 
 def process_all(_program_class_list=None):
-    print('--------PROCESSING--------')
+    print()
+    print(Fore.YELLOW, 'PROCESSING...', Style.RESET_ALL)
 
     program_class_list = _program_class_list or PROGRAM_LIST
     for program_class in program_class_list:
         show = program_class()
-        print(f'---{show.show_string}---')
+        print(f'-{show.show_string}-')
         show.process()

@@ -70,7 +70,7 @@ CHOOSE_CLASS = {
     'ThisAmer': Chooser_TAL
 }
 
-NOT_LATEST = ['RevealWk']
+NOT_LATEST = ['RevealWk', 'THEMOTH']
 
 
 def choose_files(ftp_dir, file_info_generator):
