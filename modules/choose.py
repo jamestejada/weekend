@@ -38,8 +38,8 @@ class Chooser:
             ]
 
     def _get_day_limit(self, which_file_set=None):
-        this_week = self.today - timedelta(days=self.weekday)
-        last_week = self.today - timedelta(days=(7 + self.weekday))
+        this_week = self.today - timedelta(days=self.weekday + 1)
+        last_week = self.today - timedelta(days=(8 + self.weekday))
 
         return {
             'latest': this_week,

@@ -15,9 +15,9 @@ class Reveal:
         'SGMT03': 'segment_a',
         'SGMT05': 'segment_b',
         'SGMT07': 'segment_c',
-        'SGMT02': 'music_bed_a',
-        'SGMT04': 'music_bed_b',
-        'SGMT06': 'music_bed_c'
+        'SGMT04': 'music_bed_a',
+        'SGMT06': 'music_bed_b',
+        'SGMT02': 'music_bed_C'
     }
     CUT_NUMBERS = {
         'promo': '17984',
@@ -27,7 +27,7 @@ class Reveal:
         'segment_c': '17983',
         'music_bed_a': '17980',
         'music_bed_b': '17982'
-        # 'music_bed_c': ''
+        # 'music_bed_c': 'NOT USED'
     }
     LOCAL_PATH = LOCAL_PATH
     FOR_DROPBOX = FOR_DROPBOX
