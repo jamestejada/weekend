@@ -89,6 +89,7 @@ class Reveal:
             if source and source.exists():
                 self._message(destination)
                 self.normalize(source, destination)
+                self._done_message()
 
     def normalize(self, source, destination):
         norm = FFmpegNormalize(
@@ -115,9 +116,16 @@ class Reveal:
             self._message(destination)
             conversion_func = self.normalize if os.name == 'nt' else self.convert_to_mp3
             conversion_func(source, destination)
+            self._done_message()
 
     def _message(self, destination_path):
-        print(f'Writing "{destination_path.name}" to "{destination_path.parent.stem}"')
+        print(
+            f'Writing "{destination_path.name}" to "{destination_path.parent.stem}"...',
+            end='', flush=True
+            )
+
+    def _done_message(self):
+        print(Fore.GREEN, 'DONE', Style.RESET_ALL)
 
     def convert_to_mp3(self, source, destination):
         subprocess.run(
@@ -174,7 +182,7 @@ class Reveal:
         }
     
     def __str__(self):
-        return f'-----{self.show_string}-----\n' + str(self.source_paths)
+        return f'-{self.show_string}-\n' + str(self.source_paths)
 
 
 class Latino_USA(Reveal):
@@ -308,5 +316,5 @@ def process_all(_program_class_list=None):
     program_class_list = _program_class_list or PROGRAM_LIST
     for program_class in program_class_list:
         show = program_class()
-        print(f'-{show.show_string}-')
+        print(Fore.CYAN, f'-{show.show_string}-', Style.RESET_ALL)
         show.process()

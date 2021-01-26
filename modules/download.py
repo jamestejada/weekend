@@ -1,5 +1,5 @@
 from modules.settings import LOCAL_PATH
-
+from colorama import Style, Fore
 
 class Download_Files:
 
@@ -24,7 +24,9 @@ class Download_Files:
             result = self.server.retrbinary(
                 f'RETR /{self.remote_dir}/{one_file}', out_file.write
                 )
-            print('SUCCESS' if ('226' in result) else 'FAILED')
-            return ('226' in result)
+            success = '226' in result
+            color = Fore.GREEN if success else Fore.RED
+            print(color, 'SUCCESS' if success else 'FAILED', Style.RESET_ALL)
+            return success
 
 
