@@ -15,6 +15,7 @@ from modules.process import PROGRAM_LIST
 # TO DO: 
 #   DONE - Add 'reset' functionality to delete directories
 #   DONE - Add Air Date to file names
+import time
 def main():
 
     if RESET:
@@ -22,11 +23,19 @@ def main():
             shutil.rmtree(str(directory), ignore_errors=True)
         return
 
-    prx_server = None
     if not PROCESS_ONLY:
         download_show_files()
 
+    start = time.perf_counter()
     process_all()
+    end = time.perf_counter()
+
+    thread_start = time.perf_counter()
+    process_all(threading=True)
+    thread_end = time.perf_counter()
+
+    print(f'non-threading processing time: {end - start}')
+    print(f'threading processing time: {thread_end - thread_start}')
 
 
 if __name__ == '__main__':

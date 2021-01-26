@@ -7,6 +7,9 @@ from ffmpeg_normalize import FFmpegNormalize
 from datetime import datetime, timedelta
 
 
+# temp?
+from concurrent.futures import ThreadPoolExecutor
+
 # Base Class
 class Reveal:
     NUMBER_OF_SHOW_FILES = 9
@@ -36,13 +39,15 @@ class Reveal:
     FOR_DROPBOX = FOR_DROPBOX
     FOR_FFA = FOR_FFA
     
-    def __init__(self, sample_rate=44100, target_level=-24.0, true_peak=-3.0, bitrate='256k'):
+    def __init__(self, sample_rate=44100, target_level=-24.0, true_peak=-3.0, bitrate='256k', threading=False):
         self.show_string = str(self.__class__.__name__).replace('_', ' ')
         self.air_days_string = self.get_days_string()
 
         self.file_list = self.get_file_list()
         self.source_paths = self.get_source_paths()
         self.destination_paths = self.get_destination_paths()
+
+        self.threading = threading
 
         self.target_level = target_level
         self.sample_rate = sample_rate
@@ -79,19 +84,28 @@ class Reveal:
         If a file to be written already exists, it will
         skip that file. 
         """
+        if self.threading:
+            with ThreadPoolExecutor() as executor:
+                executor.map(
+                    self.normalize,
+                    [self.source_paths.get(segment) for segment in self.CUT_NUMBERS.keys()],
+                    [self.destination_paths.get(segment) for segment in self.CUT_NUMBERS.keys()]
+                    )
+
         for segment_name in self.CUT_NUMBERS.keys():
             source = self.source_paths.get(segment_name)
             destination = self.destination_paths.get(segment_name)
 
-            if destination and destination.exists():
-                continue
-
             if source and source.exists():
-                self._message(destination)
                 self.normalize(source, destination)
-                self._done_message()
 
     def normalize(self, source, destination):
+        if destination and destination.exists():
+            return
+
+        if not self.threading:
+            self._message(destination)
+
         norm = FFmpegNormalize(
             target_level=self.target_level,
             sample_rate=self.sample_rate,
@@ -101,6 +115,10 @@ class Reveal:
         norm.add_media_file(source, destination)
         norm.run_normalization()
 
+        if self.threading:
+            self._message(destination)
+        self._done_message()
+
     def process_for_ffa(self, key='promo'):
         # source is a for_dropbox path to use already normalized files
         source = self.destination_paths.get(key)
@@ -109,14 +127,9 @@ class Reveal:
         file_name = f'{self.show_string} {key_string} {self.air_days_string}{extension}'
         destination = self.FOR_FFA.joinpath(file_name)
 
-        if destination.exists():
-            return
-
         if source and source.exists():
-            self._message(destination)
             conversion_func = self.normalize if os.name == 'nt' else self.convert_to_mp3
             conversion_func(source, destination)
-            self._done_message()
 
     def _message(self, destination_path):
         print(
@@ -128,6 +141,9 @@ class Reveal:
         print(Fore.GREEN, 'DONE', Style.RESET_ALL)
 
     def convert_to_mp3(self, source, destination):
+        if destination and destination.exists():
+            return
+        self._message(destination)
         subprocess.run(
             [
                 'ffmpeg', '-i', str(source), '-vn', '-ar', str(self.sample_rate),
@@ -135,6 +151,7 @@ class Reveal:
                 str(destination)
             ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
+        self._done_message()
 
     def get_destination_paths(self):
         return {
@@ -309,12 +326,14 @@ PROGRAM_LIST = [
 ]
 
 
-def process_all(_program_class_list=None):
+def process_all(threading = False, _program_class_list = None):
     print()
     print(Fore.YELLOW, 'PROCESSING...', Style.RESET_ALL)
 
     program_class_list = _program_class_list or PROGRAM_LIST
+
     for program_class in program_class_list:
-        show = program_class()
+        print()
+        show = program_class(threading=threading)
         print(Fore.CYAN, f'-{show.show_string}-', Style.RESET_ALL)
         show.process()

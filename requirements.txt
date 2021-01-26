@@ -1,4 +1,4 @@
 python-dotenv
 ffmpeg-normalize
 # to use ffmpeg-normalize install ffmpeg
-# on ubuntu sudo apt install ffmpeg
+# on ubuntu 'sudo apt install ffmpeg'
