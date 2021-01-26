@@ -5,7 +5,7 @@
 
 from modules.ftp import download_show_files
 from modules.process import process_all
-from modules.settings import PROCESS_ONLY, RESET, RESET_DIRS
+from modules.settings import THREAD, PROCESS_ONLY, RESET, RESET_DIRS
 import shutil
 
 
@@ -28,16 +28,7 @@ def main():
     if not PROCESS_ONLY:
         download_show_files()
 
-    start = time.perf_counter()
-    process_all()
-    end = time.perf_counter()
-
-    thread_start = time.perf_counter()
-    process_all(threading=True)
-    thread_end = time.perf_counter()
-
-    print(f'non-threading processing time: {end - start}')
-    print(f'threading processing time: {thread_end - thread_start}')
+    process_all(threading=THREAD)
 
 
 if __name__ == '__main__':

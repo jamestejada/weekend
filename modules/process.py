@@ -91,6 +91,7 @@ class Reveal:
                     [self.source_paths.get(segment) for segment in self.CUT_NUMBERS.keys()],
                     [self.destination_paths.get(segment) for segment in self.CUT_NUMBERS.keys()]
                     )
+            return
 
         for segment_name in self.CUT_NUMBERS.keys():
             source = self.source_paths.get(segment_name)
