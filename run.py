@@ -15,6 +15,9 @@ from modules.process import PROGRAM_LIST
 # TO DO: 
 #   DONE - Add 'reset' functionality to delete directories
 #   DONE - Add Air Date to file names
+#   - Maybe instead of having a chooser toggle between 'latest' and 'old'
+#       just edit the _get_day_limit() method to return a time range tuple.
+#       e.g. (today-timdelta(days=self.weekday + x), today-timedelta(days=self.weekday + y))
 import time
 def main():
 
