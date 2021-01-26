@@ -11,6 +11,7 @@ class Download_Files:
         self.server = server
     
     def download_all(self):
+        print()
         for each_file in self.download_list:
             self.download_one(each_file)
 

@@ -39,7 +39,10 @@ class Reveal:
     FOR_DROPBOX = FOR_DROPBOX
     FOR_FFA = FOR_FFA
     
-    def __init__(self, sample_rate=44100, target_level=-24.0, true_peak=-3.0, bitrate='256k', threading=False):
+    def __init__(
+        self, sample_rate=44100, target_level=-24.0,
+        true_peak=-3.0, bitrate='256k', threading=False
+        ):
         self.show_string = str(self.__class__.__name__).replace('_', ' ')
         self.air_days_string = self.get_days_string()
 
