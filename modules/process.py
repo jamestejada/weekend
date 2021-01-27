@@ -1,14 +1,12 @@
 from colorama import Fore, Style
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta
+from ffmpeg_normalize import FFmpegNormalize
+from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA
 import os
 import shutil
 import subprocess
-from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA
-from ffmpeg_normalize import FFmpegNormalize
-from datetime import datetime, timedelta
 
-
-# temp?
-from concurrent.futures import ThreadPoolExecutor
 
 # Base Class
 class Reveal:
