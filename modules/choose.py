@@ -28,49 +28,58 @@ class Chooser:
         files_only = self.all_files
         full_file_dict = self._merge_dicts(files_only)
 
-        sunday = self._get_day_limit()
-        saturday = sunday + timedelta(weeks=1)
+        first_day, last_day = self._get_day_limit()
 
         return [
             file_name for file_name, modified_date in full_file_dict.items()
-            if (sunday < datetime.strptime(modified_date, '%Y%m%d%H%M%S') <= saturday)
+            if (first_day < datetime.strptime(modified_date, '%Y%m%d%H%M%S') <= last_day)
             ]
 
-    def _get_day_limit(self, which_file_set=None):
-        this_week = self.today - timedelta(days=self.weekday + 1)
-        last_week = self.today - timedelta(days=(8 + self.weekday))
+    def _get_day_limit(self):
 
-        return {
-            'latest': this_week,
-            'old': last_week
-        }.get(which_file_set or self.which_file_set)
+        week_offset_days = 7 if self.which_file_set == 'old' else 0
+        week_offset = timedelta(days=week_offset_days)
+
+        first_day = self.today - self.first_day_offset - week_offset
+        last_day =  self.today + self.last_day_offset - week_offset
+
+        return (first_day, last_day)
+
+    @property
+    def first_day_offset(self):
+        return timedelta(days=self.weekday + 1)
+    
+    @property
+    def last_day_offset(self):
+        return timedelta(days=5 - self.weekday)
 
 
 class Chooser_Snap_Judgment(Chooser):
     # override
-    def _get_day_limit(self, which_file_set=None):
-        # This gets promo uploaded last friday
-        return self.today - timedelta(days=self.weekday + 3)
+    @property
+    def first_day_offset(self):
+        return timedelta(days=self.weekday + 3)
 
 
 class Chooser_TAL(Chooser):
     # override
-    def _get_day_limit(self, which_file_set=None):
+    @property
+    def first_day_offset(self):
         # This gets Promos uploaded Saturday Evening.
-        return self.today - timedelta(days=self.weekday + 2)
+        return timedelta(days=self.weekday + 2)
 
 
-class Chooser_Reveal(Chooser):
+class Chooser_Latino_USA(Chooser):
     # override
-    def _get_day_limit(self, which_file_set=None):
-        # last week, but with date modification
-        return self.today - timedelta(days=self.weekday + 9)
+    @property
+    def first_day_offset(self):
+        return timedelta(days=self.weekday + 2)
 
 
 CHOOSE_CLASS = {
     # Matches classes with ftp directory
-    'LatinoUS': Chooser,
-    'RevealWk': Chooser_Reveal,
+    'LatinoUS': Chooser_Latino_USA,
+    'RevealWk': Chooser,
     'SaysYou1': Chooser,
     'SnapJudg': Chooser_Snap_Judgment,
     'THEMOTH': Chooser,
