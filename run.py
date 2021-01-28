@@ -1,19 +1,13 @@
-# TO DO: 
-#   - Add mp3 conversion for FFA promos?
-#       - or just user audition (this would also take
-#           care of loudness standards etc.)
-
-from modules.ftp import download_show_files
-from modules.process import process_all
 from modules.settings import THREAD, PROCESS_ONLY, RESET, RESET_DIRS
 import shutil
+from modules.coordinate import Pipe_Control
 
 
 # TO DO: 
 #   DONE - Add 'reset' functionality to delete directories
 #   DONE - Add Air Date to file names
 #   - Tweak Latino USA
-#   - Add functionality to get latest file if it is newer than stored file.
+#   DONE - Add functionality to get latest file if it is newer than stored file.
 #   - Add thing to check what files we have and which we still need
 #       - Reveal - 
 #       (Green) PROMO
@@ -23,21 +17,18 @@ import shutil
 #       e.g. (today-timdelta(days=self.weekday + x), today-timedelta(days=self.weekday + y))
 
 
-import time
 def main():
 
     if RESET:
         remove_directories()
         return
 
-    if not PROCESS_ONLY:
-        download_show_files()
-
-    process_all(threading=THREAD)
+    Pipe_Control(process_only=PROCESS_ONLY, threading=THREAD).execute()
 
 
 def remove_directories():
     for directory in RESET_DIRS:
+        print(directory)
         shutil.rmtree(str(directory), ignore_errors=True)
 
 

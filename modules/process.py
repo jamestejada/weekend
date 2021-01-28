@@ -2,7 +2,7 @@ from colorama import Fore, Style
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from ffmpeg_normalize import FFmpegNormalize
-from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA
+from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA, FORCE_PROCESS, DRY_RUN
 import os
 import shutil
 import subprocess
@@ -36,19 +36,22 @@ class Reveal:
     LOCAL_PATH = LOCAL_PATH
     FOR_DROPBOX = FOR_DROPBOX
     FOR_FFA = FOR_FFA
+    FORCE = FORCE_PROCESS
     
     def __init__(
-        self, sample_rate=44100, target_level=-24.0,
+        self, process_list=None, sample_rate=44100, target_level=-24.0,
         true_peak=-3.0, bitrate='256k', threading=False
         ):
         self.show_string = str(self.__class__.__name__).replace('_', ' ')
         self.air_days_string = self.get_days_string()
 
-        self.file_list = self.get_file_list()
+        self.process_list = process_list
+        self.file_list = self.get_file_list(process_list=self.process_list)
         self.source_paths = self.get_source_paths()
         self.destination_paths = self.get_destination_paths()
 
         self.threading = threading
+        self.dry_run = DRY_RUN
 
         self.target_level = target_level
         self.sample_rate = sample_rate
@@ -98,11 +101,22 @@ class Reveal:
             source = self.source_paths.get(segment_name)
             destination = self.destination_paths.get(segment_name)
 
-            if source and source.exists():
+            if self.dry_run and destination:
+                self._message(destination)
+                print()
+            elif source and source.exists():
                 self.normalize(source, destination)
 
+    def _should_skip(self, destination):
+        return all([
+            destination, 
+            destination.exists(),
+            not self.FORCE,
+            not self.process_list
+        ])
+
     def normalize(self, source, destination):
-        if destination and destination.exists():
+        if self._should_skip(destination):
             return
 
         if not self.threading:
@@ -129,7 +143,10 @@ class Reveal:
         file_name = f'{self.show_string} {key_string} {self.air_days_string}{extension}'
         destination = self.FOR_FFA.joinpath(file_name)
 
-        if source and source.exists():
+        if self.dry_run and destination and key in self.source_paths.keys():
+            self._message(destination)
+            print()
+        elif source and source.exists():
             conversion_func = self.normalize if os.name == 'nt' else self.convert_to_mp3
             conversion_func(source, destination)
 
@@ -143,8 +160,9 @@ class Reveal:
         print(Fore.GREEN, 'DONE', Style.RESET_ALL)
 
     def convert_to_mp3(self, source, destination):
-        if destination and destination.exists():
+        if self._should_skip(destination):
             return
+
         self._message(destination)
         subprocess.run(
             [
@@ -169,18 +187,26 @@ class Reveal:
             + f'{segment_string} {self.air_days_string}{extension}'
             )
     
-    def get_file_list(self):
-        file_list = [
-            file_path for file_path in self.LOCAL_PATH.iterdir()
-            if self.match_show(file_path.name)
+    def get_file_list(self, process_list=None):
+
+        downloaded_list = [
+                LOCAL_PATH.joinpath(file_name) for file_name in process_list
+                if self.match_show(file_name)
             ]
-        assert len(file_list) <= self.NUMBER_OF_SHOW_FILES, (
+        directory_list = [
+                file_path for file_path in self.LOCAL_PATH.iterdir()
+                if self.match_show(file_path.name)
+        ]
+        assert len(directory_list) <= self.NUMBER_OF_SHOW_FILES, (
             f'Too many files for show, {self.show_string}'
             )
-        return file_list
+        return downloaded_list if process_list else directory_list
 
     def match_show(self, file_name):
-        return any((show_match_str in file_name) for show_match_str in self.SHOW_MATCH)
+        return any(
+            (show_match_str in file_name)
+            for show_match_str in self.SHOW_MATCH
+            )
     
     def get_source_paths(self):
         """Returns a dictionary with segment name as key

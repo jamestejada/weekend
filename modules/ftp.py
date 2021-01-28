@@ -38,6 +38,7 @@ def download_show_files():
     print()
 
     for ftp_dir, show_name in FTP_DIR_LIST:
+        print()
         print(Fore.CYAN, f'-{show_name}-', Style.RESET_ALL)
         process_ftp_dir(prx_server, ftp_dir)
     

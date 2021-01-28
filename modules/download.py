@@ -1,4 +1,4 @@
-from modules.settings import LOCAL_PATH
+from modules.settings import LOCAL_PATH, DRY_RUN
 from colorama import Style, Fore
 
 class Download_Files:
@@ -9,16 +9,15 @@ class Download_Files:
         self.download_list = download_list
         self.remote_dir = remote_dir
         self.server = server
+        self.dry_run = DRY_RUN
     
     def download_all(self):
-        print()
         for each_file in self.download_list:
-            self.download_one(each_file)
+            which_function = print if self.dry_run else self.download_one
+            which_function(each_file)
 
     def download_one(self, one_file):
         full_path = self.LOCAL_PATH.joinpath(one_file)
-        if full_path.exists():
-            return
 
         with open(full_path, 'wb') as out_file:
             print(f'Downloading {one_file}...', end='', flush=True)
