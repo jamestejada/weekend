@@ -22,9 +22,9 @@ class PRX:
     PASSWORD = os.getenv('PRX_PASSWORD')
 
 
-LOCAL_PATH = from_cwd('downloads')
-FOR_DROPBOX = from_cwd('for_dropbox')
-FOR_FFA = from_cwd('for_ffa')
+LOCAL_PATH = from_cwd('files', 'downloads')
+FOR_DROPBOX = from_cwd('files', 'for_dropbox')
+FOR_FFA = from_cwd('files', 'for_ffa')
 
 DROPBOX_PATH = Path('/mnt/w')
 FFA_PATH = Path('/mnt/ffa').joinpath('- Corona Continuity Breaks -', 'Promos')
