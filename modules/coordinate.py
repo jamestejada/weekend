@@ -1,7 +1,8 @@
 from modules.choose import (
     Chooser,
     Chooser_Snap_Judgment,
-    Chooser_TAL
+    Chooser_TAL,
+    Chooser_Latino_USA
     )
 from modules.process import (
     Reveal,
@@ -18,7 +19,7 @@ from modules.download import Download_Files
 PIPELINES = {
     'LatinoUS': {
         'show_name': 'Latino USA',
-        'chooser': Chooser,
+        'chooser': Chooser_Latino_USA,
         'processor': Latino_USA
     },
     'RevealWk': {
@@ -52,10 +53,11 @@ class Pipe_Control:
     PIPELINES = PIPELINES
     GET_OLDER_FILES = ['RevealWk', 'THEMOTH']
 
-    def __init__(self, process_only=False, threading=False):
+    def __init__(self, process_only=False, threading=False, dry_run=False):
         self.file_process_list = []
         self.process_only = process_only
         self.threading = threading
+        self.dry_run = dry_run
 
     def execute(self):
         if not self.process_only:
@@ -86,7 +88,11 @@ class Pipe_Control:
 
         which_file_set = 'old' if ftp_dir in self.GET_OLDER_FILES else 'latest'
         chooser_class = self.PIPELINES.get(ftp_dir).get('chooser')
-        chooser = chooser_class(file_info_generator, which_file_set=which_file_set)
+        chooser = chooser_class(
+            file_info_generator=file_info_generator,
+            which_file_set=which_file_set,
+            dry_run=self.dry_run
+            )
         file_get_list = chooser.files_to_get()
 
         for each_file in file_get_list:

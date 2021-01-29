@@ -7,7 +7,7 @@ load_dotenv()
 
 
 def check_flags(flags) -> bool:
-    return any([(arg in flags) for arg in sys.argv[1:]])
+    return any([(arg.lower() in flags) for arg in sys.argv[1:]])
 
 
 def from_cwd(*path_list):
@@ -26,6 +26,9 @@ LOCAL_PATH = from_cwd('downloads')
 FOR_DROPBOX = from_cwd('for_dropbox')
 FOR_FFA = from_cwd('for_ffa')
 
+DROPBOX_PATH = Path('/mnt/w')
+FFA_PATH = Path('/mnt/ffa').joinpath('- Corona Continuity Breaks -', 'Promos')
+
 RESET_DIRS = [LOCAL_PATH, FOR_DROPBOX, FOR_FFA]
 
 
@@ -34,3 +37,5 @@ RESET = check_flags(['reset', 'delete'])
 THREAD = check_flags(['thread', 'threading'])
 FORCE_PROCESS = check_flags(['force'])
 DRY_RUN = check_flags(['mock', 'dry'])
+CLEAN = check_flags(['clean'])
+COPY = check_flags(['copy'])

@@ -342,26 +342,3 @@ class This_American_Life(Reveal):
         'segment_b': '17042',
         'music_bed_a': '17041'
     }
-
-
-PROGRAM_LIST = [
-    Reveal,
-    Latino_USA,
-    Says_You,
-    The_Moth,
-    Snap_Judgment,
-    This_American_Life
-]
-
-
-def process_all(threading = False, _program_class_list = None):
-    print()
-    print(Fore.YELLOW, 'PROCESSING...', Style.RESET_ALL)
-
-    program_class_list = _program_class_list or PROGRAM_LIST
-
-    for program_class in program_class_list:
-        print()
-        show = program_class(threading=threading)
-        print(Fore.CYAN, f'-{show.show_string}-', Style.RESET_ALL)
-        show.process()
