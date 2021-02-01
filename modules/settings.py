@@ -33,9 +33,10 @@ RESET_DIRS = [LOCAL_PATH, FOR_DROPBOX, FOR_FFA]
 
 
 PROCESS_ONLY = check_flags(['process_only', 'process'])
-RESET = check_flags(['reset', 'delete'])
 THREAD = check_flags(['thread', 'threading'])
 FORCE_PROCESS = check_flags(['force'])
 DRY_RUN = check_flags(['mock', 'dry'])
+
+RESET = check_flags(['reset', 'delete'])
 CLEAN = check_flags(['clean'])
 COPY = check_flags(['copy'])

@@ -1,3 +1,4 @@
+import time
 from datetime import datetime, timedelta
 from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA
 from modules.process import Reveal
@@ -5,16 +6,19 @@ from modules.process import Reveal
 class Chooser:
     """ base class for selecting which files to download from FTP
     """
-    MTIME_OFFSET = timedelta(hours=8)
 
     def __init__(self, file_info_generator=None, which_file_set='latest', dry_run=False):
+        self.dry_run = dry_run
         self.file_info_generator = file_info_generator or []
         self.which_file_set = which_file_set
         self.all_files = self._files_only_filter(self.file_info_generator)
+
+        # time and date
+        daylight_savings = time.localtime().tm_isdst
+        self.mtime_offset = timedelta(hours=(7 if daylight_savings else 8))
         self.today = datetime.today()
         self.weekday = self.today.weekday()
 
-        self.dry_run = dry_run
 
     def files_to_get(self):
         full_file_dict = self._merge_dicts(self.all_files)
@@ -46,15 +50,16 @@ class Chooser:
         if first_day < remote_mtime <= last_day:
             if local_path.exists():
                 local_timestamp = local_path.stat().st_mtime
-                local_mtime = datetime.fromtimestamp(local_timestamp) + self.MTIME_OFFSET
+                local_mtime = datetime.fromtimestamp(local_timestamp) + self.mtime_offset
                 if self.dry_run:
                     self._debug_time(local_mtime, remote_mtime)
                 return local_mtime < remote_mtime
             return True
 
     def _debug_time(self, local_mtime, remote_mtime):
-        local_string = local_mtime.strftime('%d/%m/%y %H:%M:%S')
-        remote_string = remote_mtime.strftime('%d/%m/%y %H:%M:%S')
+        strftime_string = '%m/%d/%y %H:%M:%S'
+        local_string = local_mtime.strftime(strftime_string)
+        remote_string = remote_mtime.strftime(strftime_string)
         print(
             f'{local_string} < {remote_string}: {local_mtime < remote_mtime}',
             f' | local - remote = {local_mtime-remote_mtime}'

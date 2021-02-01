@@ -22,10 +22,10 @@ def copy_all():
     for each_file in FOR_DROPBOX.iterdir():
         modified_date = datetime.fromtimestamp(each_file.stat().st_mtime)
         now = datetime.now()
-        one_hour = timedelta(hours=1)
+        thirty_minutes = timedelta(minutes=30)
 
         should_upload = all([
-            ((now - modified_date) < one_hour),
+            ((now - modified_date) < thirty_minutes),
             each_file.suffix in ['.mp3', '.wav'],
             ])
 
