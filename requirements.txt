@@ -1,4 +1,3 @@
-pytz
 python-dotenv
 ffmpeg-normalize
 # to use ffmpeg-normalize install ffmpeg
