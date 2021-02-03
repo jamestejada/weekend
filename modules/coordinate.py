@@ -2,7 +2,8 @@ from modules.choose import (
     Chooser,
     Chooser_Snap_Judgment,
     Chooser_TAL,
-    Chooser_Latino_USA
+    Chooser_Latino_USA,
+    Chooser_Reveal
     )
 from modules.process import (
     Reveal,
@@ -24,7 +25,7 @@ PIPELINES = {
     },
     'RevealWk': {
         'show_name': 'Reveal',
-        'chooser': Chooser,
+        'chooser': Chooser_Reveal,
         'processor': Reveal
     },
     'SaysYou1': {
