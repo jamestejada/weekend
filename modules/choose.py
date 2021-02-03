@@ -48,7 +48,7 @@ class Chooser:
         first_day, last_day = self._get_day_limit()
 
         if first_day < remote_mtime <= last_day:
-            if local_path.exists() and self.which_file_set != 'old':
+            if local_path.exists():
                 local_timestamp = local_path.stat().st_mtime
                 local_mtime = datetime.fromtimestamp(local_timestamp) + self.mtime_offset
                 if self.dry_run:
