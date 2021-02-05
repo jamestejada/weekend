@@ -101,7 +101,7 @@ class Chooser_TAL(Chooser):
 class Chooser_Latino_USA(Chooser):
     @property
     def first_day_offset(self):
-        return timedelta(days=self.weekday + 2)
+        return timedelta(days=self.weekday + 3)
 
 class Chooser_Reveal(Chooser):
     @property
