@@ -1,10 +1,11 @@
 from modules.settings import (
     THREAD, PROCESS_ONLY, RESET, RESET_DIRS, CLEAN, DRY_RUN,
-    FFA_PATH, DROPBOX_PATH, COPY
+    FFA_PATH, DROPBOX_PATH, COPY, CHECK
     )
 import shutil
 from modules.coordinate import Pipe_Control
 from modules.copy import copy_all
+from modules.check import check_all
 
 
 # TO DO: 
@@ -33,6 +34,10 @@ def main():
     
     if COPY:
         copy_all()
+        return
+    
+    if CHECK:
+        check_all()
         return
 
     Pipe_Control(

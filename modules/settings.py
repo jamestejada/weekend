@@ -36,6 +36,7 @@ PROCESS_ONLY = check_flags(['process_only', 'process'])
 THREAD = check_flags(['thread', 'threading'])
 FORCE_PROCESS = check_flags(['force'])
 DRY_RUN = check_flags(['mock', 'dry'])
+CHECK = check_flags(['check'])
 
 RESET = check_flags(['reset', 'delete'])
 CLEAN = check_flags(['clean'])

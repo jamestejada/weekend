@@ -175,11 +175,13 @@ class Reveal:
 
     def get_destination_paths(self):
         return {
-            segment: self.get_dropbox_file_name(segment, extension=file_path.suffix)
+            segment: self.get_dropbox_path(segment, extension=file_path.suffix)
             for segment, file_path in self.source_paths.items()
         }
 
-    def get_dropbox_file_name(self, segment_name, extension='.wav'):
+    def get_dropbox_path(self, segment_name, extension='.wav'):
+        """ Returns the destination path for DROPBOX files.
+        """
         segment_string = segment_name.replace('_', ' ').upper()
 
         return self.FOR_DROPBOX.joinpath(
@@ -190,7 +192,8 @@ class Reveal:
     def get_file_list(self, process_list=None):
 
         downloaded_list = [
-                LOCAL_PATH.joinpath(file_name) for file_name in process_list
+                self.LOCAL_PATH.joinpath(file_name)
+                for file_name in process_list or []
                 if self.match_show(file_name)
             ]
         directory_list = [
