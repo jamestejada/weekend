@@ -8,7 +8,7 @@ class Check_BASE(process.Reveal):
         exist_dict = self._which_exist()
         for segment in exist_dict:
             color = Fore.GREEN if exist_dict.get(segment) else Fore.RED
-            style = Style.NORMAL if exist_dict.get(segment) else Style.DIM
+            style = Style.BRIGHT if exist_dict.get(segment) else Style.NORMAL
             print(color, style, segment.replace('_', ' ').title(), Style.RESET_ALL)
     
     def _which_exist(self):
