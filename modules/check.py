@@ -2,7 +2,7 @@ from modules import process
 from colorama import Style, Fore
 
 
-class Check_BASE(process.Reveal):
+class Check_BASE(process.Process_BASE):
     def check(self):
         print(Fore.CYAN, f'\n-{self}-', Style.RESET_ALL)
         exist_dict = self._which_exist()
@@ -12,6 +12,10 @@ class Check_BASE(process.Reveal):
             print(color, style, segment.replace('_', ' ').title(), Style.RESET_ALL)
     
     def _which_exist(self):
+        """ Compares set of all possible segments to existing segments
+        in download folder and creates a dictionary with booleans for each
+        possible segment.
+        """
         return {
             segment_name: (segment_name in self.source_paths.keys())
             for segment_name in self.CUT_NUMBERS.keys()

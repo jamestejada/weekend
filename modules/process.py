@@ -4,40 +4,25 @@ from datetime import datetime, timedelta
 from ffmpeg_normalize import FFmpegNormalize
 from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA, FORCE_PROCESS, DRY_RUN
 import os
-import shutil
 import subprocess
 
 
-# Base Class
-class Reveal:
-    NUMBER_OF_SHOW_FILES = 9
-    SHOW_MATCH = ['RevealWk_']
-    AIR_DAYS = [4]
-    SEGMENT_MATCHES = {
-        'PROM01': 'promo',
-        'SGMT01': 'billboard',
-        'SGMT03': 'segment_a',
-        'SGMT05': 'segment_b',
-        'SGMT07': 'segment_c',
-        'SGMT04': 'music_bed_a',
-        'SGMT06': 'music_bed_b',
-        'SGMT02': 'music_bed_C'
-    }
-    CUT_NUMBERS = {
-        'promo': '17984',
-        'billboard': '17978',
-        'segment_a': '17979',
-        'segment_b': '17981',
-        'segment_c': '17983',
-        'music_bed_a': '17980',
-        'music_bed_b': '17982'
-        # 'music_bed_c': 'NOT USED'
-    }
+class Process_BASE:
+    """ This class finds downloaded files for a specific program, 
+    processes them (normalize to -24 LUFs and/or convert to mp3),
+    and renames for ENCO Dropbox or FFA network drive (for remote hosts).
+    """
+    NUMBER_OF_SHOW_FILES = None
+    SHOW_MATCH = None
+    AIR_DAYS = None
+    SEGMENT_MATCHES = None
+    CUT_NUMBERS = None
+
     LOCAL_PATH = LOCAL_PATH
     FOR_DROPBOX = FOR_DROPBOX
     FOR_FFA = FOR_FFA
     FORCE = FORCE_PROCESS
-    
+
     def __init__(
         self, process_list=None, sample_rate=44100, target_level=-24.0,
         true_peak=-3.0, bitrate='256k', threading=False
@@ -45,7 +30,9 @@ class Reveal:
         self.show_string = str(self.__class__.__name__).replace('_', ' ')
         self.air_days_string = self.get_days_string()
 
+        print(Fore.CYAN, f'-{self.show_string}-', Style.RESET_ALL)
         self.process_list = process_list
+
         self.file_list = self.get_file_list(process_list=self.process_list)
         self.source_paths = self.get_source_paths()
         self.destination_paths = self.get_destination_paths()
@@ -199,10 +186,15 @@ class Reveal:
         directory_list = [
                 file_path for file_path in self.LOCAL_PATH.iterdir()
                 if self.match_show(file_path.name)
-        ]
-        assert len(directory_list) <= self.NUMBER_OF_SHOW_FILES, (
-            f'Too many files for show, {self.show_string}'
-            )
+            ]
+        try:
+            assert len(directory_list) <= self.NUMBER_OF_SHOW_FILES, (
+                f'Too many files for show, {self.show_string}'
+                )
+        except AssertionError as e:
+            print(Fore.RED, Style.BRIGHT, 'ERROR: ', e, Style.RESET_ALL)
+            print('\n'.join(file_name.name for file_name in directory_list))
+            return []
         return downloaded_list if process_list else directory_list
 
     def match_show(self, file_name):
@@ -233,7 +225,33 @@ class Reveal:
         return f'-{self.show_string}-\n' + str(self.source_paths)
 
 
-class Latino_USA(Reveal):
+class Reveal(Process_BASE):
+    NUMBER_OF_SHOW_FILES = 9
+    SHOW_MATCH = ['RevealWk_']
+    AIR_DAYS = [4]
+    SEGMENT_MATCHES = {
+        'PROM01': 'promo',
+        'SGMT01': 'billboard',
+        'SGMT03': 'segment_a',
+        'SGMT05': 'segment_b',
+        'SGMT07': 'segment_c',
+        'SGMT04': 'music_bed_a',
+        'SGMT06': 'music_bed_b',
+        'SGMT02': 'music_bed_C'
+    }
+    CUT_NUMBERS = {
+        'promo': '17984',
+        'billboard': '17978',
+        'segment_a': '17979',
+        'segment_b': '17981',
+        'segment_c': '17983',
+        'music_bed_a': '17980',
+        'music_bed_b': '17982'
+        # 'music_bed_c': 'NOT USED'
+    }
+
+
+class Latino_USA(Process_BASE):
     SHOW_MATCH = [str(num) for num in range(35232, 35249)]
     NUMBER_OF_SHOW_FILES = 9
     AIR_DAYS = [6]
@@ -259,7 +277,7 @@ class Latino_USA(Reveal):
     }
 
 
-class Says_You(Reveal):
+class Says_You(Process_BASE):
     SHOW_MATCH = ['SaysYou1_']
     NUMBER_OF_SHOW_FILES = 6
     AIR_DAYS = [6]
@@ -279,7 +297,7 @@ class Says_You(Reveal):
     }
 
 
-class The_Moth(Reveal):
+class The_Moth(Process_BASE):
     SHOW_MATCH = ['THEMOTH_']
     NUMBER_OF_SHOW_FILES = 7
     AIR_DAYS = [6]
@@ -304,7 +322,7 @@ class The_Moth(Reveal):
     }
 
 
-class Snap_Judgment(Reveal):
+class Snap_Judgment(Process_BASE):
     SHOW_MATCH =[str(num) for num in range(14155, 14162)]
     NUMBER_OF_SHOW_FILES = 7
     AIR_DAYS = [6]
@@ -328,7 +346,7 @@ class Snap_Judgment(Reveal):
     }
 
 
-class This_American_Life(Reveal):
+class This_American_Life(Process_BASE):
     SHOW_MATCH = ['ThisAmer_']
     NUMBER_OF_SHOW_FILES = 5
     AIR_DAYS = [5, 6]

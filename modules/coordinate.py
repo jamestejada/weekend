@@ -51,6 +51,8 @@ PIPELINES = {
 }
 
 class Pipe_Control:
+    """This class coordinates choosing, downloading and processing
+    of various show files."""
     PIPELINES = PIPELINES
     GET_OLDER_FILES = ['RevealWk', 'THEMOTH']
 
@@ -69,16 +71,18 @@ class Pipe_Control:
         prx_server = connect()
 
         for ftp_dir, pipe_info_dict in self.PIPELINES.items():
-            print()
-            show_name = pipe_info_dict.get('show_name')
-            print(Fore.CYAN, f'-{show_name}-', Style.RESET_ALL)
-            self._process_ftp_dir(prx_server, ftp_dir)
+            self._process_ftp_dir(prx_server, ftp_dir, pipe_info_dict)
 
         prx_server.close()
     
-    def _process_ftp_dir(self, server, ftp_dir):
+    def _process_ftp_dir(self, server, ftp_dir, pipe_info):
         file_info_generator = server.mlsd(f'/{ftp_dir}')
         files_to_get = self._choose_files(ftp_dir, file_info_generator)
+
+        if files_to_get:
+            print()
+            show_name = pipe_info.get('show_name')
+            print(Fore.CYAN, f'-{show_name}-', Style.RESET_ALL)
 
         download_files = Download_Files(server, ftp_dir, files_to_get)
         download_files.download_all()
@@ -108,5 +112,5 @@ class Pipe_Control:
             print()
             show_class = pipe_info_dict.get('processor')
             show = show_class(threading=self.threading, process_list=self.file_process_list)
-            print(Fore.CYAN, f'-{show.show_string}-', Style.RESET_ALL)
             show.process()
+

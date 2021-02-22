@@ -1,7 +1,7 @@
 import time
 from datetime import datetime, timedelta
-from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA
-from modules.process import Reveal
+from modules.settings import LOCAL_PATH
+
 
 class Chooser:
     """ base class for selecting which files to download from FTP
@@ -23,10 +23,29 @@ class Chooser:
     def files_to_get(self):
         full_file_dict = self._merge_dicts(self.all_files)
 
-        return [
-            file_name for file_name, modified_date in full_file_dict.items()
-            if self.date_compare(file_name, modified_date)
-            ]
+        return self._episode_check(
+                [
+                    file_name for file_name, modified_date in full_file_dict.items()
+                    if self.date_compare(file_name, modified_date)
+                ]
+            )
+    
+    def _episode_check(self, file_list):
+        """Extended in subclasses to allow for checks ensuring all files are
+        of the same episode
+        """
+        try:
+            if file_list:
+                # max() will choose the highest number episode in file_list
+                episode_number = max([int(file_name.split('_')[1]) for file_name in file_list])
+                episode = str(episode_number)
+                return [file_name for file_name in file_list if episode in file_name]
+
+        except IndexError:
+            # file_name does not contain episode number
+            pass
+
+        return file_list
     
     def _files_only_filter(self, raw_file_info_gen):
         return [
@@ -102,6 +121,7 @@ class Chooser_Latino_USA(Chooser):
     @property
     def first_day_offset(self):
         return timedelta(days=self.weekday + 3)
+
 
 class Chooser_Reveal(Chooser):
     @property
