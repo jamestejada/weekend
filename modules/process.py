@@ -29,8 +29,8 @@ class Process_BASE:
         ):
         self.show_string = str(self.__class__.__name__).replace('_', ' ')
         self.air_days_string = self.get_days_string()
-
         print(Fore.CYAN, f'-{self.show_string}-', Style.RESET_ALL)
+
         self.process_list = process_list
 
         self.file_list = self.get_file_list(process_list=self.process_list)
@@ -45,6 +45,10 @@ class Process_BASE:
         self.true_peak = true_peak
         self.bitrate = bitrate
 
+    # main
+    def process(self):
+        self.process_for_dropbox()
+        self.process_for_ffa()
     
     def get_days_string(self):
         """returns a string containing formatted air dates
@@ -62,10 +66,6 @@ class Process_BASE:
             for day in self.AIR_DAYS
             ]
         return ' and '.join(air_date_list)
-
-    def process(self):
-        self.process_for_dropbox()
-        self.process_for_ffa()
     
     def process_for_dropbox(self):
         """ Prepares files for ENCO Dropbox. This method

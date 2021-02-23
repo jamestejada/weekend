@@ -1,18 +1,4 @@
-from modules.choose import (
-    Chooser,
-    Chooser_Snap_Judgment,
-    Chooser_TAL,
-    Chooser_Latino_USA,
-    Chooser_Reveal
-    )
-from modules.process import (
-    Reveal,
-    Latino_USA,
-    Says_You,
-    The_Moth,
-    Snap_Judgment,
-    This_American_Life
-)
+from modules import choose, process
 from modules.ftp import connect
 from colorama import Fore, Style
 from modules.download import Download_Files
@@ -20,33 +6,33 @@ from modules.download import Download_Files
 PIPELINES = {
     'LatinoUS': {
         'show_name': 'Latino USA',
-        'chooser': Chooser_Latino_USA,
-        'processor': Latino_USA
+        'chooser': choose.Chooser_Latino_USA,
+        'processor': process.Latino_USA
     },
     'RevealWk': {
         'show_name': 'Reveal',
-        'chooser': Chooser_Reveal,
-        'processor': Reveal
+        'chooser': choose.Chooser_Reveal,
+        'processor': process.Reveal
     },
     'SaysYou1': {
         'show_name': 'Says You',
-        'chooser': Chooser,
-        'processor': Says_You
+        'chooser': choose.Chooser,
+        'processor': process.Says_You
     },
     'SnapJudg': {
         'show_name': 'Snap Judgment',
-        'chooser': Chooser_Snap_Judgment,
-        'processor': Snap_Judgment
+        'chooser': choose.Chooser_Snap_Judgment,
+        'processor': process.Snap_Judgment
     },
     'THEMOTH': {
         'show_name': 'The Moth',
-        'chooser': Chooser,
-        'processor': The_Moth
+        'chooser': choose.Chooser,
+        'processor': process.The_Moth
     },
     'ThisAmer': {
         'show_name': 'This American Life',
-        'chooser': Chooser_TAL,
-        'processor': This_American_Life
+        'chooser': choose.Chooser_TAL,
+        'processor': process.This_American_Life
     }
 }
 
@@ -93,9 +79,13 @@ class Pipe_Control:
 
         which_file_set = 'old' if ftp_dir in self.GET_OLDER_FILES else 'latest'
         chooser_class = self.PIPELINES.get(ftp_dir).get('chooser')
+        process_class = self.PIPELINES.get(ftp_dir).get('processor')
+        path_list = process_class().get_file_list()
+        local_list = [file_path.name for file_path in path_list]
         chooser = chooser_class(
             file_info_generator=file_info_generator,
             which_file_set=which_file_set,
+            local_list=local_list,
             dry_run=self.dry_run
             )
         file_get_list = chooser.files_to_get()

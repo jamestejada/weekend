@@ -7,7 +7,11 @@ class Chooser:
     """ base class for selecting which files to download from FTP
     """
 
-    def __init__(self, file_info_generator=None, which_file_set='latest', dry_run=False):
+    def __init__(self, 
+        file_info_generator=None, which_file_set='latest', 
+        local_list=None, dry_run=False):
+
+        self.local_list = local_list
         self.dry_run = dry_run
         self.file_info_generator = file_info_generator or []
         self.which_file_set = which_file_set
@@ -19,17 +23,19 @@ class Chooser:
         self.today = datetime.today()
         self.weekday = self.today.weekday()
 
-
     def files_to_get(self):
         full_file_dict = self._merge_dicts(self.all_files)
+        # XXX: Check logic here
+        remote_files = [
+            file_name for file_name, modified_date in full_file_dict.items()
+            if self.date_compare(file_name, modified_date)
+        ]
+        file_list = remote_files if not self.local_list else [
+                                                *remote_files,
+                                                *self.local_list
+                                                ]
+        return self._episode_check(file_list)
 
-        return self._episode_check(
-                [
-                    file_name for file_name, modified_date in full_file_dict.items()
-                    if self.date_compare(file_name, modified_date)
-                ]
-            )
-    
     def _episode_check(self, file_list):
         """Extended in subclasses to allow for checks ensuring all files are
         of the same episode
