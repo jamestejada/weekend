@@ -8,20 +8,6 @@ from modules.copy import copy_all
 from modules.check import check_all
 
 
-# TO DO: 
-#   DONE - Add 'reset' functionality to delete directories
-#   DONE - Add Air Date to file names
-#   DONE - Tweak Latino USA
-#   DONE - Add functionality to get latest file if it is newer than stored file.
-#   - Add thing to check what files we have and which we still need
-#       - Reveal - 
-#       (Green) PROMO
-#       (Red) SEGMENT A
-#   DONE - Maybe instead of having a chooser toggle between 'latest' and 'old'
-#       just edit the _get_day_limit() method to return a time range tuple.
-#       e.g. (today-timdelta(days=self.weekday + x), today-timedelta(days=self.weekday + y))
-
-
 def main():
 
     if RESET:
@@ -52,12 +38,12 @@ def remove_directories():
         shutil.rmtree(str(directory), ignore_errors=True)
 
 def clean_directories():
-    """ removes .pkf files created when checking things in 
+    """ removes non-mp3 and non-wav files created when checking things in 
     Adobe Audition.
     """
     for directory in RESET_DIRS:
         for path in directory.iterdir():
-            if path.suffix == '.pkf':
+            if path.suffix not in ['.wav', '.mp3']:
                 path.unlink()
 
 
