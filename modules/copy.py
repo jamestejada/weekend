@@ -10,7 +10,6 @@ def copy_all():
         modified_date_str = datetime.fromtimestamp(modified_date).strftime('%Y%m%d%H%M%S')
         static_chooser = Chooser()
         should_upload = static_chooser.date_compare(
-                    each_file.name,
                     modified_date_str
                 ) and static_chooser.is_newer(
                     each_file.name,
