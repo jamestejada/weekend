@@ -7,11 +7,17 @@ from datetime import datetime, timedelta
 def copy_all():
     for each_file in FOR_FFA.iterdir():
         modified_date = each_file.stat().st_mtime
-        should_upload = Chooser().date_compare(
-            each_file.name, 
-            datetime.fromtimestamp(modified_date).strftime('%Y%m%d%H%M%S'),
-            local_file_dir=FFA_PATH
-            )
+        modified_date_str = datetime.fromtimestamp(modified_date).strftime('%Y%m%d%H%M%S')
+        static_chooser = Chooser()
+        should_upload = static_chooser.date_compare(
+                    each_file.name,
+                    modified_date_str
+                ) and static_chooser.is_newer(
+                    each_file.name,
+                    modified_date_str,
+                    local_file_dir=FFA_PATH
+                )
+        
         if should_upload and each_file.suffix in ['.mp3', '.wav']:
             print(f'Copying {each_file.name} from {each_file.parent.stem} to FFA')
             shutil.copyfile(
