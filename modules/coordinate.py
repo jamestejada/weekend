@@ -48,6 +48,7 @@ class Pipe_Control:
         self.threading = threading
         self.dry_run = dry_run
 
+    # main
     def execute(self):
         if not self.process_only:
             self.download_show_files()
@@ -66,12 +67,15 @@ class Pipe_Control:
         files_to_get = self._choose_files(ftp_dir, file_info_generator)
 
         if files_to_get:
-            print()
-            show_name = pipe_info.get('show_name')
-            print(Fore.CYAN, f'-{show_name}-', Style.RESET_ALL)
+            self.print_show(pipe_info.get('show_name'))
 
         download_files = Download_Files(server, ftp_dir, files_to_get)
         download_files.download_all()
+    
+    def print_show(self, show_name):
+        print()
+        print(Fore.CYAN, f'-{show_name}-', Style.RESET_ALL)
+
 
     def _choose_files(self, ftp_dir, file_info_generator):
         if ftp_dir not in self.PIPELINES.keys():
@@ -79,9 +83,12 @@ class Pipe_Control:
 
         which_file_set = 'old' if ftp_dir in self.GET_OLDER_FILES else 'latest'
         chooser_class = self.PIPELINES.get(ftp_dir).get('chooser')
+
+        # for getting local files of same show
         process_class = self.PIPELINES.get(ftp_dir).get('processor')
         path_list = process_class().get_file_list()
         local_list = [file_path.name for file_path in path_list]
+
         chooser = chooser_class(
             file_info_generator=file_info_generator,
             which_file_set=which_file_set,
@@ -99,7 +106,7 @@ class Pipe_Control:
         print(Fore.YELLOW, 'PROCESSING...', Style.RESET_ALL)
 
         for _, pipe_info_dict in self.PIPELINES.items():
-            print()
+            self.print_show(pipe_info_dict.get('show_name'))
             show_class = pipe_info_dict.get('processor')
             show = show_class(threading=self.threading, process_list=self.file_process_list)
             show.process()

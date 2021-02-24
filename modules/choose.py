@@ -22,36 +22,46 @@ class Chooser:
         self.mtime_offset = timedelta(hours=(7 if daylight_savings else 8))
         self.today = datetime.today()
         self.weekday = self.today.weekday()
+        
+        self.files_in_date_range = self.get_files_in_date_range(self.all_files)
+        self.episode = self.get_episode(self.files_in_date_range)
 
+    # main
     def files_to_get(self):
-        full_file_dict = self._merge_dicts(self.all_files)
-        # XXX: Check logic here
-        remote_files = [
-            file_name for file_name, modified_date in full_file_dict.items()
-            if self.date_compare(file_name, modified_date)
+        return [
+            file_name for file_name, modified_date in self.files_in_date_range
+            if self._episode_check(file_name) 
+            and self.is_newer(file_name, modified_date)
         ]
-        file_list = remote_files if not self.local_list else [
-                                                *remote_files,
-                                                *self.local_list
-                                                ]
-        return self._episode_check(file_list)
+    
+    def get_files_in_date_range(self, all_files):
+        full_file_dict = self._merge_dicts(all_files)
+        return [
+            (file_name, modified_date) 
+            for file_name, modified_date in full_file_dict.items()
+            if self.date_compare(modified_date)
+        ]
 
-    def _episode_check(self, file_list):
-        """Extended in subclasses to allow for checks ensuring all files are
-        of the same episode
+    def _episode_check(self, file_name):
+        """ If episode strings are in the file names, this method will 
+        check if the file is of the correct episode.
+        """
+        if self.episode:
+            return (self.episode in file_name)
+        return True
+
+    def get_episode(self, file_list):
+        """Returns string of desired episode number.
         """
         try:
             if file_list:
                 # max() will choose the highest number episode in file_list
-                episode_number = max([int(file_name.split('_')[1]) for file_name in file_list])
-                episode = str(episode_number)
-                return [file_name for file_name in file_list if episode in file_name]
-
+                episode_number = max([int(file_name.split('_')[1]) for file_name, _ in file_list])
+                return str(episode_number)
         except IndexError:
             # file_name does not contain episode number
             pass
-
-        return file_list
+        return None
     
     def _files_only_filter(self, raw_file_info_gen):
         return [
@@ -66,20 +76,27 @@ class Chooser:
         for each_dict in dict_list:
             output_dict.update(each_dict)
         return output_dict
+    
+    def _get_remote_time(self, modified_date: str):
+        return datetime.strptime(modified_date, '%Y%m%d%H%M%S')
 
-    def date_compare(self, file_name, modified_date: str, local_file_dir=LOCAL_PATH):
-        local_path = local_file_dir.joinpath(file_name)
-        remote_mtime = datetime.strptime(modified_date, '%Y%m%d%H%M%S')
+    def date_compare(self, modified_date: str):
+        remote_mtime = self._get_remote_time(modified_date)
         first_day, last_day = self._get_day_limit()
 
-        if first_day < remote_mtime <= last_day:
-            if local_path.exists():
-                local_timestamp = local_path.stat().st_mtime
-                local_mtime = datetime.fromtimestamp(local_timestamp) + self.mtime_offset
-                if self.dry_run:
-                    self._debug_time(local_mtime, remote_mtime)
-                return local_mtime < remote_mtime
-            return True
+        return (first_day < remote_mtime <= last_day)
+    
+    def is_newer(self, file_name, modified_date: str, local_file_dir=LOCAL_PATH):
+        local_path = local_file_dir.joinpath(file_name)
+        remote_mtime = self._get_remote_time(modified_date)
+
+        if local_path.exists():
+            local_timestamp = local_path.stat().st_mtime
+            local_mtime = datetime.fromtimestamp(local_timestamp) + self.mtime_offset
+            if self.dry_run:
+                self._debug_time(local_mtime, remote_mtime)
+            return local_mtime < remote_mtime # or in desired episode
+        return True
 
     def _debug_time(self, local_mtime, remote_mtime):
         strftime_string = '%m/%d/%y %H:%M:%S'

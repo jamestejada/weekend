@@ -29,7 +29,6 @@ class Process_BASE:
         ):
         self.show_string = str(self.__class__.__name__).replace('_', ' ')
         self.air_days_string = self.get_days_string()
-        print(Fore.CYAN, f'-{self.show_string}-', Style.RESET_ALL)
 
         self.process_list = process_list
 
