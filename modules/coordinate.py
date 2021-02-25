@@ -90,10 +90,10 @@ class Pipe_Control:
         local_list = [file_path.name for file_path in path_list]
 
         chooser = chooser_class(
-            file_info_generator=file_info_generator,
-            which_file_set=which_file_set,
-            local_list=local_list,
-            dry_run=self.dry_run
+                file_info_generator=file_info_generator,
+                which_file_set=which_file_set,
+                local_list=local_list,
+                dry_run=self.dry_run
             )
         file_get_list = chooser.files_to_get()
 
@@ -110,4 +110,3 @@ class Pipe_Control:
             show_class = pipe_info_dict.get('processor')
             show = show_class(threading=self.threading, process_list=self.file_process_list)
             show.process()
-
