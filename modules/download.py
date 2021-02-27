@@ -1,4 +1,4 @@
-from modules.settings import LOCAL_PATH, DRY_RUN
+from modules.settings import LOCAL_PATH, DRY_RUN, SAT_PATH
 from colorama import Style, Fore
 
 class Download_Files:
@@ -30,3 +30,6 @@ class Download_Files:
             return success
 
 
+def sat_download(dry_run=DRY_RUN):
+    # continue here
+    pass

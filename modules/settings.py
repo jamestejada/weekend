@@ -21,7 +21,7 @@ class PRX:
     USERNAME = os.getenv('PRX_USERNAME')
     PASSWORD = os.getenv('PRX_PASSWORD')
 
-
+SAT_PATH = Path('/mnt/satb')
 LOCAL_PATH = from_cwd('files', 'downloads')
 FOR_DROPBOX = from_cwd('files', 'for_dropbox')
 FOR_FFA = from_cwd('files', 'for_ffa')
