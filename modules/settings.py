@@ -21,23 +21,25 @@ class PRX:
     USERNAME = os.getenv('PRX_USERNAME')
     PASSWORD = os.getenv('PRX_PASSWORD')
 
-SAT_PATH = Path('/mnt/satb')
+SAT_PATH = Path(os.getenv('SAT_MOUNT'))
 LOCAL_PATH = from_cwd('files', 'downloads')
 FOR_DROPBOX = from_cwd('files', 'for_dropbox')
 FOR_FFA = from_cwd('files', 'for_ffa')
 
-DROPBOX_PATH = Path('/mnt/w')
-FFA_PATH = Path('/mnt/ffa').joinpath('- Corona Continuity Breaks -', 'Promos')
+DROPBOX_PATH = Path(os.getenv('DROPBOX_MOUNT'))
+FFA_PATH = Path(os.getenv('FFA_MOUNT')).joinpath('- Corona Continuity Breaks -', 'Promos')
 
 RESET_DIRS = [LOCAL_PATH, FOR_DROPBOX, FOR_FFA]
 
 
+# Execution Path Flags
 PROCESS_ONLY = check_flags(['process_only', 'process'])
 THREAD = check_flags(['thread', 'threading'])
 FORCE_PROCESS = check_flags(['force'])
 DRY_RUN = check_flags(['mock', 'dry'])
-CHECK = check_flags(['check'])
 
+CHECK = check_flags(['check'])
 RESET = check_flags(['reset', 'delete'])
 CLEAN = check_flags(['clean'])
 COPY = check_flags(['copy'])
+SAT = check_flags(['sat', 'satellite'])

@@ -1,6 +1,6 @@
 from modules.settings import (
     THREAD, PROCESS_ONLY, RESET, RESET_DIRS, CLEAN, DRY_RUN,
-    FFA_PATH, DROPBOX_PATH, COPY, CHECK
+    COPY, CHECK, SAT
     )
 import shutil
 from modules.coordinate import Pipe_Control
@@ -9,6 +9,10 @@ from modules.check import check_all
 
 
 def main():
+
+    if SAT:
+        print('Satellite things...')
+        return
 
     if RESET:
         remove_directories()
