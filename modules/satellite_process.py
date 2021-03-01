@@ -6,11 +6,19 @@ transfer to FFA for continuity producers.
 """
 
 class Process_Satellite_BASE(Process_BASE):
+    # override
     def process_for_ffa(self, key='promo'):
         super().process_for_ffa(key=key)
         # process then delete source in for_dropbox
         # (it already delivers via satellite)
-        self.destination_paths.get(key).unlink(missing_ok=True)
+        dropbox_file_path = self.destination_paths.get(key)
+        if dropbox_file_path:
+            dropbox_file_path.unlink()
+    
+    # override
+    def _should_skip(self, destination):
+        # Don't skip any...process all satellite files.
+        return False
 
 
 class Ask_Me_Another(Process_Satellite_BASE):
@@ -25,13 +33,15 @@ class Ask_Me_Another(Process_Satellite_BASE):
 class Hidden_Brain(Process_Satellite_BASE):
     SHOW_MATCH = ['HiddenB1_']
     NUMBER_OF_SHOW_FILES = 1
+    AIR_DAYS = [6]
     SEGMENT_MATCHES = {'SGMT01': 'promo'}
     CUT_NUMBERS = {'promo': '18120'}
 
 
 class Wait_Wait(Process_Satellite_BASE):
     SHOW_MATCH = ['WaitWa2_']
-    NUMBER_OF_SHOW_FILES = 1
+    NUMBER_OF_SHOW_FILES = 2
+    AIR_DAYS = [6]
     SEGMENT_MATCHES = {'SGMT02': 'promo'}
     CUT_NUMBERS = {'promo': '25366'}
 
@@ -39,5 +49,6 @@ class Wait_Wait(Process_Satellite_BASE):
 class WeSun(Process_Satellite_BASE):
     SHOW_MATCH = ['Weeken20_']
     NUMBER_OF_SHOW_FILES = 1
+    AIR_DAYS = [6]
     SEGMENT_MATCHES = {'SGMT01': 'promo'}
     CUT_NUMBERS = {'promo': '25389'}

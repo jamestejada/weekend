@@ -1,5 +1,8 @@
+from pathlib import Path
 from modules.settings import LOCAL_PATH, DRY_RUN, SAT_PATH
 from colorama import Style, Fore
+import shutil
+
 
 class Download_Files:
 
@@ -30,6 +33,38 @@ class Download_Files:
             return success
 
 
-def sat_download(dry_run=DRY_RUN):
-    # continue here
-    pass
+class Sat_Download:
+
+    LOCAL_PATH = LOCAL_PATH
+    SAT_PATH = SAT_PATH
+
+    def __init__(self, download_list: list):
+        self.download_list = download_list
+        self.dry_run = DRY_RUN
+    
+    def download_all(self):
+        results = []
+        for each_file in self.download_list:
+            which_function = print if self.dry_run else self.download_one
+            result = which_function(each_file)
+            results.append(True if self.dry_run else result)
+        return results
+    
+    def download_one(self, one_file) -> bool:
+        full_path = self.LOCAL_PATH.joinpath(one_file)
+        full_sat_path = self.SAT_PATH.joinpath(one_file)
+    
+        print(f'Downloading {one_file}...', end='', flush=True)
+        try:
+            self.copy(full_sat_path, full_path)
+            color = Fore.GREEN
+            success = True
+        except:
+            color = Fore.RED
+            success = False
+        finally:
+            print(color, 'SUCCESS' if success else 'FAILED', Style.RESET_ALL)
+        return success
+
+    def copy(self, remote_path: Path, local_path: Path):
+        shutil.copy(str(remote_path), str(local_path))

@@ -3,6 +3,7 @@ import sys
 from dotenv import load_dotenv
 from pathlib import Path
 
+
 load_dotenv()
 
 
@@ -20,6 +21,7 @@ class PRX:
     IP = os.getenv('PRX_IP')
     USERNAME = os.getenv('PRX_USERNAME')
     PASSWORD = os.getenv('PRX_PASSWORD')
+
 
 SAT_PATH = Path(os.getenv('SAT_MOUNT'))
 LOCAL_PATH = from_cwd('files', 'downloads')

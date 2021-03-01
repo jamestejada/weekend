@@ -6,7 +6,6 @@ from modules.settings import LOCAL_PATH
 class Chooser:
     """ base class for selecting which files to download from FTP
     """
-
     def __init__(self, 
         file_info_generator=None, which_file_set='latest', 
         local_list=None, dry_run=False):
