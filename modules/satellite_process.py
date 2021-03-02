@@ -21,6 +21,14 @@ class Process_Satellite_BASE(Process_BASE):
         return False
 
 
+class Its_Been_A_Minute(Process_Satellite_BASE):
+    SHOW_MATCH = ['ItsBeen1_']
+    NUMBER_OF_SHOW_FILES = 1
+    AIR_DAYS = [5]
+    SEGMENT_MATCHES = {'SGMT01': 'promo'}
+    CUT_NUMBERS = {'promo': '17790'}
+
+
 class Ask_Me_Another(Process_Satellite_BASE):
     SHOW_MATCH = ['AskMeA1_']
     NUMBER_OF_SHOW_FILES = 1
@@ -41,7 +49,7 @@ class Hidden_Brain(Process_Satellite_BASE):
 class Wait_Wait(Process_Satellite_BASE):
     SHOW_MATCH = ['WaitWa2_']
     NUMBER_OF_SHOW_FILES = 2
-    AIR_DAYS = [6]
+    AIR_DAYS = [5, 6]
     SEGMENT_MATCHES = {'SGMT02': 'promo'}
     CUT_NUMBERS = {'promo': '25366'}
 
