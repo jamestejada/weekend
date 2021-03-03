@@ -40,6 +40,10 @@ PIPELINES = {
 }
 
 SAT_PIPES = {
+    'Its_Been_A_Minute':{
+        'show_name': 'Its Been a Minute',
+        'processor': satellite_process.Its_Been_A_Minute
+    },
     'Ask_Me_Another': {
         'show_name': 'Ask Me Another',
         'processor': satellite_process.Ask_Me_Another

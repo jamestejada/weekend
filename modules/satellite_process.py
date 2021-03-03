@@ -6,6 +6,8 @@ transfer to FFA for continuity producers.
 """
 
 class Process_Satellite_BASE(Process_BASE):
+    # Develop something to catch generic promos in segment matches later
+
     # override
     def process_for_ffa(self, key='promo'):
         super().process_for_ffa(key=key)
@@ -13,8 +15,10 @@ class Process_Satellite_BASE(Process_BASE):
         # (it already delivers via satellite)
         dropbox_file_path = self.destination_paths.get(key)
         if dropbox_file_path:
+            # delete dropbox file so it doesn't copy to dropbox.
+            # That is already done with depot monitor.
             dropbox_file_path.unlink()
-    
+
     # override
     def _should_skip(self, destination):
         # Don't skip any...process all satellite files.
@@ -34,7 +38,6 @@ class Ask_Me_Another(Process_Satellite_BASE):
     NUMBER_OF_SHOW_FILES = 1
     AIR_DAYS = [6]
     SEGMENT_MATCHES = {'SGMT01': 'promo'}
-    # Develop something to catch generic promos in segment matches later
     CUT_NUMBERS = {'promo': '17020'}
 
 
