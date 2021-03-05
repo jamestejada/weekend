@@ -15,9 +15,9 @@ class Process_Satellite_BASE(Process_BASE):
         # (it already delivers via satellite)
         dropbox_file_path = self.destination_paths.get(key)
         download_path = self.source_paths.get(key)
+
+        # cleanup files that are not needed
         if dropbox_file_path:
-            # delete dropbox file so it doesn't copy to dropbox.
-            # That is already done with depot monitor.
             dropbox_file_path.unlink()
         if download_path:
             download_path.unlink()
