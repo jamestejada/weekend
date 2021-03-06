@@ -40,7 +40,7 @@ THREAD = check_flags(['thread', 'threading'])
 FORCE_PROCESS = check_flags(['force'])
 DRY_RUN = check_flags(['mock', 'dry'])
 
-CHECK = check_flags(['check'])
+CHECK = check_flags(['check', 'stat', 'status'])
 RESET = check_flags(['reset', 'delete'])
 CLEAN = check_flags(['clean'])
 COPY = check_flags(['copy'])
