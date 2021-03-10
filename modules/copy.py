@@ -27,7 +27,7 @@ def copy_all():
     for each_file in FOR_DROPBOX.iterdir():
         modified_date = datetime.fromtimestamp(each_file.stat().st_mtime)
         now = datetime.now()
-        max_time = timedelta(minutes=90)
+        max_time = timedelta(minutes=60)
 
         should_upload = all([
             ((now - modified_date) < max_time),
