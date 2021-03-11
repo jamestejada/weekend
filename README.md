@@ -19,7 +19,7 @@ All of the above, but **automatically**.
 - Automatic file downloads
     - Based on modified date as well as episode number
     - Satellite files are downloaded as well
-renaming of files based on air date.
+- Renaming of files based on air date.
 - Automatic renames files with the correct names based on air date
 - Automatic processing of files
     - Normalization to industry standard (-24 LUFs)
@@ -35,13 +35,81 @@ renaming of files based on air date.
 
 ### Dependencies
 - [ffmpeg](https://ffmpeg.org/) for audio processing
-    ```bash
-    $ sudo apt install ffmpeg
-    ```
 - [cifs-utils](https://wiki.samba.org/index.php/LinuxCIFS_utils) (not needed on WSL) - Used for mounting Windows network drives from linux
-    ```
-    $ sudo apt install cifs-utils
-    ```
 - libraries:
     - python-dotenv
     - ffmpeg-normalize
+
+## Setup
+1. Clone repository (currently private)
+1. Create a `.env` file in the modules folder with the following fields (NOTE: Do not use quotes around the paths)
+    - Mount paths
+        - `SAT_MOUNT={{ satellite samba mount path }}`
+        - `DROPBOX_MOUNT={{ Dropbox samba mount path }}`
+        - `FFA_MOUNT={{ remote continuity mount path }}`
+        - EXAMPLE: 
+            ```
+            DROPBOX_MOUNT=/mnt/dropbox
+            ```
+    - PRX FTP credentials
+        - `PRX_IP={{ IP Address }}`
+        - `PRX_USERNAME={{ username }}`
+        - `PRX_PASSWORD={{ password }}`
+1. Create mount paths for satellite, dropbox, remote-continuity network shares. Make sure they are the same paths you set in the `.env` file.
+    - EXAMPLE: 
+        ```
+        $ sudo mkdir /mnt/dropbox
+        ```
+1. Install external dependencies
+    - [ffmpeg](https://ffmpeg.org/)
+        ```
+        $ sudo apt install ffmpeg
+        ```
+    - [cifs-utils](https://wiki.samba.org/index.php/LinuxCIFS_utils) - If on purely Ubuntu machine use [cifs-utils](https://wiki.samba.org/index.php/LinuxCIFS_utils) to mount Windows samba shares in Ubuntu. (NOTE: This is **NOT** needed for Windows Subsystem Linux)
+        ```
+        $ sudo apt install cifs-utils
+        ```
+1. Edit `/etc/fstab`, adding a line for each mount
+    ```
+    $ sudo nano /etc/fstab
+    ```
+    - Example for WSL:
+        ```
+        N:/ /mnt/ffa drvfs defaults 0 0
+        L:/ /mnt/satellite drvfs defaults 0 0
+        ```
+    - Example for Ubuntu Machine
+        ```
+        //192.168.1.23/dropbox /mnt/dropbox cifs vers=2.0,credentials=/root/cred,iocharset=utf8 0 0
+
+        //192.168.1.32/ffa /mnt/ffa cifs vers=2.0,credentials=/root/other_cred,iocharset=utf8 0 0
+        ```
+        
+1. Create Virtual Environment
+    ```
+    $ ./environ
+    ```
+1. Install python dependencies
+    ```
+    (venv) $ pip install -r requirements.txt
+    ```
+## Using This Program
+This program is meant to be run using the `weekend` script. Simply run the script and it will trigger the program with any flags you enter afterward. 
+```
+$ ./weekend
+
+$ ./weekend dry
+
+$ ./weekend xds
+```
+NOTE: If you are running this on an Ubuntu Machine, you may have to run it as root to gain access to the credentials files if they are stored in the root folder (as I have done).
+
+Here is a list of possible flags for the program:
+- `sat`, `satellite`, `xds` - run satellite promo processing and file deletion
+- `copy` - copy files to remote continuity and dropbox folders
+- `clean` - cleans .pkf files leftover from editing files in Adobe Audition
+- `reset`, `delete` - deletes all audio files (used to prepare for the next week's files)
+- `check`, `stat`, `status` - runs the checking program which shows which files have been downloaded and which have not.
+- `mock`, `dry` - dry run
+- `process_only`, `process` - run process only, no download
+- `thread`, `threading` - using multi-threading to improve performance (use this only on beefier machines that can handle it)
