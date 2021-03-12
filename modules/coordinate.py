@@ -6,7 +6,7 @@ from colorama import Fore, Style
 from modules.download import Download_Files, Sat_Download
 
 
-PIPELINES = {
+EXECUTIONS = {
     'LatinoUS': {
         'show_name': 'Latino USA',
         'chooser': choose.Chooser_Latino_USA,
@@ -39,7 +39,7 @@ PIPELINES = {
     }
 }
 
-SAT_PIPES = {
+SAT_EXEC = {
     'Its_Been_A_Minute':{
         'show_name': 'Its Been a Minute',
         'processor': satellite_process.Its_Been_A_Minute
@@ -66,7 +66,7 @@ SAT_PIPES = {
 class Pipe_Control:
     """This class coordinates choosing, downloading and processing
     of various show files."""
-    PIPELINES = PIPELINES
+    EXECUTIONS = EXECUTIONS
     GET_OLDER_FILES = ['RevealWk', 'THEMOTH']
 
     def __init__(self, process_only: bool = False, 
@@ -86,7 +86,7 @@ class Pipe_Control:
     def download_show_files(self):
         prx_server = connect()
 
-        for ftp_dir, pipe_info_dict in self.PIPELINES.items():
+        for ftp_dir, pipe_info_dict in self.EXECUTIONS.items():
             self._process_ftp_dir(prx_server, ftp_dir, pipe_info_dict)
 
         prx_server.close()
@@ -106,14 +106,14 @@ class Pipe_Control:
         print(Fore.CYAN, f'-{show_name}-', Style.RESET_ALL)
 
     def _choose_files(self, ftp_dir, file_info_generator):
-        if ftp_dir not in self.PIPELINES.keys():
+        if ftp_dir not in self.EXECUTIONS.keys():
             return
 
         which_file_set = 'old' if ftp_dir in self.GET_OLDER_FILES else 'latest'
-        chooser_class = self.PIPELINES.get(ftp_dir).get('chooser')
+        chooser_class = self.EXECUTIONS.get(ftp_dir).get('chooser')
 
         # for getting local files of same show
-        process_class = self.PIPELINES.get(ftp_dir).get('processor')
+        process_class = self.EXECUTIONS.get(ftp_dir).get('processor')
         path_list = process_class().get_file_list()
         local_list = [file_path.name for file_path in path_list]
 
@@ -133,7 +133,7 @@ class Pipe_Control:
         print()
         print(Fore.YELLOW, 'PROCESSING...', Style.RESET_ALL)
 
-        for _, pipe_info_dict in self.PIPELINES.items():
+        for _, pipe_info_dict in self.EXECUTIONS.items():
             self.print_show(pipe_info_dict.get('show_name'))
             show_class = pipe_info_dict.get('processor')
             show = show_class(
@@ -145,7 +145,7 @@ class Pipe_Control:
 
 
 class Sat_Control:
-    SAT_PIPES = SAT_PIPES
+    SAT_EXEC = SAT_EXEC
 
     def __init__(self, process_only: bool = False, 
             threading: bool = False, dry_run: bool = False):
@@ -165,7 +165,7 @@ class Sat_Control:
             Style.RESET_ALL
             )
         all_results = []
-        for _, pipe_info in self.SAT_PIPES.items():
+        for _, pipe_info in self.SAT_EXEC.items():
             download_list = self._choose_files(pipe_info)
 
             if download_list:
@@ -197,7 +197,7 @@ class Sat_Control:
         print()
         print(Fore.YELLOW, 'PROCESSING...', Style.RESET_ALL)
 
-        for _, pipe_info in self.SAT_PIPES.items():
+        for _, pipe_info in self.SAT_EXEC.items():
             show_name = pipe_info.get('show_name')
             self.print_show(show_name)
             processor = self._get_processor_instance(pipe_info)

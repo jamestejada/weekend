@@ -117,10 +117,16 @@ class Chooser:
 
     @property
     def first_day_offset(self):
+        """ Returns the days to be subtracted from today to reach the
+        earliest date modified that will be accepted for download. 
+        """
         return timedelta(days=self.weekday + 1)
 
     @property
     def last_day_offset(self):
+        """ Returns the days to be added to today to reach the
+        latest date modified that will be accepted for download. 
+        """
         return timedelta(days=5 - self.weekday)
 
 
@@ -140,12 +146,14 @@ class Chooser_TAL(Chooser):
 
 
 class Chooser_Latino_USA(Chooser):
+    # override
     @property
     def first_day_offset(self):
         return timedelta(days=self.weekday + 3)
 
 
 class Chooser_Reveal(Chooser):
+    # override
     @property
     def first_day_offset(self):
         return timedelta(days=self.weekday + 2)
