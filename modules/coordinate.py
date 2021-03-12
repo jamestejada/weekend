@@ -142,8 +142,6 @@ class Pipe_Control:
             show.process()
 
 
-
-
 class Sat_Control:
     SAT_EXEC = SAT_EXEC
 
@@ -179,7 +177,7 @@ class Sat_Control:
             self.clear_satellite()
     
     def _all_success(self, results: list):
-        """ checks all sublist of results list
+        """ checks all sublists of results list
         for any False values (if a copy command fails)
         """
         return all(
