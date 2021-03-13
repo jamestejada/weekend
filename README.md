@@ -12,6 +12,8 @@
 1. BONUS TASK A: Get satellite files for show promos so that remote hosts can use those as well.
 1. BONUS TASK B: Delete satellite files off of the backup receiver (this is so that we can keep a "hot" backup of our satellite receiver configured in the exact same way as the primary without overloading the harddrive on the receiver)
 
+![The Original Process](./PRX_Downloads.png)
+
 ## What does this program do?
 All of the above, but **automatically**.
 
