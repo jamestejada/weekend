@@ -26,7 +26,7 @@ All of the above, but **automatically**.
     - mp3 conversion for promos
 - Copying files appropriate destinations (i.e. ENCO Dropbox, or Continuity Folder)
 - Deletes files from satellite receiver
-- Threading (well... Python 'threading') for increased audio processing speed. (Threading allows the asynchronous execution of multiple audio conversions at the same time)
+- Threading (well... Python 'threading') for increased audio processing speed. (Threading allows the execution of multiple audio conversions at the same time)
 
 ## Requirements
 ### Development Environment
