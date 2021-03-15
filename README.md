@@ -12,7 +12,7 @@
 1. BONUS TASK A: Get satellite files for show promos so that remote hosts can use those as well.
 1. BONUS TASK B: Delete satellite files off of the backup receiver (this is so that we can keep a "hot" backup of our satellite receiver configured in the exact same way as the primary without overloading the harddrive on the receiver)
 
-![The Original Process](./PRX_Downloads.png)
+![The Original Process](./images/PRX_Downloads.png)
 
 ## What does this program do?
 All of the above, but **automatically**.
@@ -21,28 +21,29 @@ All of the above, but **automatically**.
 - Automatic file downloads
     - Based on modified date as well as episode number
     - Satellite files are downloaded as well
-- Renaming of files based on air date.
-- Automatic renames files with the correct names based on air date
+- Automatic renaming of files based on air date, destination and show
 - Automatic processing of files
     - Normalization to industry standard (-24 LUFs)
     - mp3 conversion for promos
 - Copying files appropriate destinations (i.e. ENCO Dropbox, or Continuity Folder)
-- Deletes files from satellite receiver
-- Threading (well... Python 'threading') for increased audio processing speed. (Threading allows the execution of multiple audio conversions at the same time)
+- Deletion of files from satellite receiver
+- Threading for increased audio processing speed. (Threading allows the execution of multiple audio conversions at the same time)
 
 ## Requirements
+---
 ### Development Environment
 - Python 3.8.5
 - Ubuntu 20.04 LTS Server (As OS or Windows Subsystem for Linux Distrubution)
----
+
 ### Dependencies
 - [ffmpeg](https://ffmpeg.org/) for audio processing
 - [cifs-utils](https://wiki.samba.org/index.php/LinuxCIFS_utils) (not needed on WSL) - Used for mounting Windows network drives from linux
 - libraries:
     - python-dotenv
     - ffmpeg-normalize
----
+
 ## Setup
+---
 1. Clone repository (currently private)
 1. Create a `.env` file in the modules folder with the following fields (NOTE: Do not use quotes around the paths)
     - Mount paths
@@ -99,8 +100,9 @@ All of the above, but **automatically**.
     ```
     (venv) $ pip install -r requirements.txt
     ```
----
+
 ## Using This Program
+---
 This program is meant to be run using the `weekend` script. Simply run the script and it will trigger the program with any flags you enter afterward. 
 ```
 $ ./weekend
@@ -129,18 +131,17 @@ Here is a list of possible flags for the program:
 
 - Reset [`reset`, `delete`] - deletes all audio files (used to prepare for the next week's files)
 
-- Process Only [`process_only`, `process`] - runs processing only, no download. This was added for the times when manual download was still needed (e.g. during times when two shows were uploaded in the same week) but processing could still be done automatically.
+- Process Only [`process_only`, `process`] - runs processing only, no download. This was added for the times when manual download was still needed (e.g. during times when two shows were uploaded in the same week) but processing, and copying could be done by this program.
 
-- Clean [`clean`] - cleans .pkf files leftover from editing files in Adobe Audition
+- Clean [`clean`] - cleans extraneous files leftover from editing audio in Adobe Audition
 
 - Check Show Files [`check`, `stat`, `status`] - runs the checking program which shows which files have been downloaded and which have not.
 
 - Threading [`thread`, `threading`] - using multi-threading to improve performance (for machines that are not using their full processing capacity)
+
+
+## Setting Up Automatic Execution using Cron Jobs
 ---
-## Other Considerations
-
-### Setting Up Automatic Execution using Cron Jobs
-
 As mentioned before, I have set this up using a machine with Ubuntu 20.04 Server installed. I have also mounted the needed shared drives for execution so that this process can be self-contained (i.e. I will not have to execute this program on another machine). The next step was to trigger the different execution paths at different times to continuously check the FTP for new show files, and continuously check the backup Satellite reciever for new files.  
   
 For this implementation I have used the crontab file located at `/etc/crontab` in Ubuntu.
@@ -157,7 +158,7 @@ Here is an example of the lines I have added to this file:
 ```
 If you haven't used cron jobs before, the first five columns with combinations of numbers and stars tell the machine when to execute command, the next column (in this case containing `root`) is the user as whom we will execute the command, and the following expressions are the command itself.  
 
-#### **Timing Instructions**
+### **Timing Instructions**
 To check your timing instructions, you can enter them in [crontab.guru](https://crontab.guru) and get an expression in English about when your commands will execute. 
 
 The timing instructions are broken down as follows:
@@ -169,29 +170,24 @@ The timing instructions are broken down as follows:
 # |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
 # |  |  |  |  |
 ```
-A star denotes that the command will execute at every iteration of the time interval. 
+A star denotes that the command will execute at every iteration of the time interval.  
 For example: 
-```
-* * * * *
-```
+- `* * * * *` will execute every minute, of every hour, of every day of the month, of every month, on every day of the week 
+- `7 * * * 1-5` will execute on minute 7 of every hour, of every day of the month, of every month, monday through friday
 
-will execute every minute, of every hour, of every day of the month, of every month, on every day of the week, and 
-```
-7 * * * 1-5
-```
-will execute on minute 7 of every hour, of every day of the month, of every month, monday through friday.
-
-#### **User**
+### **User**
 Since we need root access for permission to read/write to the Network Drives, we will run this program as `root`
 
-#### **Command**
+### **Command**
 Consider this command in the `crontab`:
 ```
 cd /path/to/project && bash weekend && bash weekend copy
 ```
 To execute this program, we will first need to navigate to the project folder `cd /path/to/project` then we use `&&` to chain another command which executes the downloading and processing `bash weekend`. After processing is done, we chain to another command which executes the program again with a `copy` flag and copies all the processed files to their destinations `&& bash weekend copy`
 
-### Adding New Shows (PRX)
+## Adding Programs
+---
+### Adding New PRX Shows
 To add a new show for download/processing, three things must be changed. 
 1. Processing Class
     - The processing base class has been designed so that adding a new show will only involve inheriting from `Process_BASE` and setting class variables.
@@ -301,7 +297,7 @@ To add a new show for download/processing, three things must be changed.
     - `chooser` - desired `Chooser` class (default is `choose.Chooser`)
     - `processor` - desired processing class
 
-### Adding New Promos (Satellite)
+### Adding New Satellite Promos
 For new promos processed from the satellite receiver, only two things need to be changed
 
 1. Much like the PRX processing class, you will have to create a new show class in `./modules/satellite_process.py` that inherits from `Process_Satellite_BASE`
