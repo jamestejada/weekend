@@ -1,5 +1,5 @@
 # CapRadio Weekend Programming Bot
-> This program automates some of the manual processes related to files for weekend programming. 
+This program automates some of the manual processes related to files for weekend programming. 
 
 ## The Original 'Manual' Process
 1. Download show files from PRX as they appear (this requires checking the ftp at regular intervals)
