@@ -47,7 +47,10 @@ All of the above, but **automatically**.
 
 ## Setup
 
-1. Clone repository (currently private)
+1. Clone repository
+    ```
+    $ git clone https://github.com/jamestejada/weekend.git
+    ```
 1. Create a `.env` file in the modules folder with the following fields (NOTE: Do not use quotes around the paths)
     - Mount paths
         - `SAT_MOUNT=/path/to/satellite/share`
