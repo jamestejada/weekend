@@ -1,23 +1,26 @@
 # CapRadio Weekend Programming Bot
+> This program automates some of the manual processes related to files for weekend programming. 
 
 ## The Original 'Manual' Process
 1. Download show files from PRX as they appear (this requires checking the ftp at regular intervals)
 1. Normalize to -24 LUFs
 1. Rename files for ENCO Dropbox (Ingest for ENCO DAD radio automation system)
     - EXAMPLE: `14160_Snap Judgment SEGMENT C Mar 7.wav`
-1. Convert to mp3 (only needed for promos used for remote continuity)
-1. Rename for remote continuity folder on network drive (i.e. promos used by remote hosts during breaks)
+1. Convert to mp3 (only needed for promos used by remote hosts)
+1. Rename for remote host promo folder on network drive (i.e. promos used by remote hosts during breaks)
     - EXAMPLE: `This American Life PROMO Mar 6 and Mar 7.mp3`
-1. Copy files to their appropriate destinations (ENCO Dropbox, or remote continuity folder)
-1. BONUS TASK A: Get satellite files for show promos so that remote hosts can use those as well.
+1. Copy files to their appropriate destinations (ENCO Dropbox, or remote host promo folder)
+1. BONUS TASK A: Get and convert files for show promos that hosts working remotely can use for recorded breaks.
 1. BONUS TASK B: Delete satellite files off of the backup receiver (this is so that we can keep a "hot" backup of our satellite receiver configured in the exact same way as the primary without overloading the harddrive on the receiver)
 
 ![The Original Process](./images/PRX_Downloads.png)
 
-## What does this program do?
+## What does this program do
+---
 All of the above, but **automatically**.
 
 ## Features
+---
 - Automatic file downloads
     - Based on modified date as well as episode number
     - Satellite files are downloaded as well
@@ -47,18 +50,18 @@ All of the above, but **automatically**.
 1. Clone repository (currently private)
 1. Create a `.env` file in the modules folder with the following fields (NOTE: Do not use quotes around the paths)
     - Mount paths
-        - `SAT_MOUNT={{ satellite samba mount path }}`
-        - `DROPBOX_MOUNT={{ Dropbox samba mount path }}`
-        - `FFA_MOUNT={{ remote continuity mount path }}`
+        - `SAT_MOUNT=/path/to/satellite/share`
+        - `DROPBOX_MOUNT=/path/to/enco/dropbox`
+        - `FFA_MOUNT=/path/to/remote/host/promos`
         - EXAMPLE: 
             ```
             DROPBOX_MOUNT=/mnt/dropbox
             ```
     - PRX FTP credentials
-        - `PRX_IP={{ IP Address }}`
-        - `PRX_USERNAME={{ username }}`
-        - `PRX_PASSWORD={{ password }}`
-1. Create mount paths for satellite, dropbox, remote-continuity network shares. Make sure they are the same paths you set in the `.env` file.
+        - `PRX_IP={FTP_SERVER_ADDRESS}`
+        - `PRX_USERNAME={USERNAME}`
+        - `PRX_PASSWORD={PASSWORD}`
+1. Create mount paths for satellite, dropbox, remote host network shares. Make sure they are the same paths you set in the `.env` file.
     - EXAMPLE: 
         ```
         $ sudo mkdir /mnt/dropbox
@@ -119,13 +122,13 @@ With normal execution, this program will:
 1. Choose files to download from each show remote show directory
 1. Download the chosen files
 1. Normalize (processing) and rename for Dropbox
-1. Convert (processing) and rename for remote continuity
+1. Convert (processing) and rename for remote host promos
 
 ### Execution Flags
 Here is a list of possible flags for the program:
 - Dry Run [`mock`, `dry`] - performs a dry run of the program with no downloading or processing
 
-- Copy [`copy`] - copy files to remote continuity and dropbox folders
+- Copy [`copy`] - copy files to remote host promo and dropbox folders
 
 - Satellite [`sat`, `satellite`, `xds`] - run satellite promo processing and file deletion
 
