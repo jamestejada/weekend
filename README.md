@@ -16,11 +16,11 @@ This program automates some of the manual processes related to files for weekend
 ![The Original Process](./images/PRX_Downloads.png)
 
 ## What does this program do
----
+
 All of the above, but **automatically**.
 
 ## Features
----
+
 - Automatic file downloads
     - Based on modified date as well as episode number
     - Satellite files are downloaded as well
@@ -33,7 +33,7 @@ All of the above, but **automatically**.
 - Threading for increased audio processing speed. (Threading allows the execution of multiple audio conversions at the same time)
 
 ## Requirements
----
+
 ### Development Environment
 - Python 3.8.5
 - Ubuntu 20.04 LTS Server (As OS or Windows Subsystem for Linux Distrubution)
@@ -46,7 +46,7 @@ All of the above, but **automatically**.
     - ffmpeg-normalize
 
 ## Setup
----
+
 1. Clone repository (currently private)
 1. Create a `.env` file in the modules folder with the following fields (NOTE: Do not use quotes around the paths)
     - Mount paths
@@ -105,7 +105,7 @@ All of the above, but **automatically**.
     ```
 
 ## Using This Program
----
+
 This program is meant to be run using the `weekend` script. Simply run the script and it will trigger the program with any flags you enter afterward. 
 ```
 $ ./weekend
@@ -144,7 +144,7 @@ Here is a list of possible flags for the program:
 
 
 ## Setting Up Automatic Execution using Cron Jobs
----
+
 As mentioned before, I have set this up using a machine with Ubuntu 20.04 Server installed. I have also mounted the needed shared drives for execution so that this process can be self-contained (i.e. I will not have to execute this program on another machine). The next step was to trigger the different execution paths at different times to continuously check the FTP for new show files, and continuously check the backup Satellite reciever for new files.  
   
 For this implementation I have used the crontab file located at `/etc/crontab` in Ubuntu.
@@ -189,7 +189,7 @@ cd /path/to/project && bash weekend && bash weekend copy
 To execute this program, we will first need to navigate to the project folder `cd /path/to/project` then we use `&&` to chain another command which executes the downloading and processing `bash weekend`. After processing is done, we chain to another command which executes the program again with a `copy` flag and copies all the processed files to their destinations `&& bash weekend copy`
 
 ## Adding Programs
----
+
 ### Adding New PRX Shows
 To add a new show for download/processing, three things must be changed. 
 1. Processing Class
