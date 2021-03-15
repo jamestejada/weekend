@@ -51,7 +51,7 @@ All of the above, but **automatically**.
     ```
     $ git clone https://github.com/jamestejada/weekend.git
     ```
-1. Create a `.env` file in the modules folder with the following fields (NOTE: Do not use quotes around the paths)
+1. Create a `.env` file in the modules folder with the following environment variable assignments (NOTE: Do not use quotes around the paths)
     - Mount paths
         - `SAT_MOUNT=/path/to/satellite/share`
         - `DROPBOX_MOUNT=/path/to/enco/dropbox`
@@ -182,7 +182,7 @@ For example:
 - `7 * * * 1-5` will execute on minute 7 of every hour, of every day of the month, of every month, monday through friday
 
 ### **User**
-Since I have saved network crednetials in the `/root` directory, we need root access for permission to read/write to the Network Drives. We will run these commands as `root`.
+Since I have saved network credentials in the `/root` directory, we need root access for permission to read/write to the Network Drives. We will run these commands as `root`.
 
 ### **Command**
 Consider this command in the `crontab`:
