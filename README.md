@@ -2,8 +2,8 @@
 This program automates some of the manual processes related to files for weekend programming. 
 
 ## The Original 'Manual' Process
-1. Download show files from PRX as they appear (this requires checking the ftp at regular intervals)
-1. Normalize to -24 LUFs
+1. Download show files from The Public Radio Exchange (PRX) as they appear on the FTP server (this requires rechecking the FTP at regular intervals)
+1. Normalize files to -24 LUFs
 1. Rename files for ENCO Dropbox (Ingest for ENCO DAD radio automation system)
     - EXAMPLE: `14160_Snap Judgment SEGMENT C Mar 7.wav`
 1. Convert to mp3 (only needed for promos used by remote hosts)
