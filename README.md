@@ -179,7 +179,7 @@ For example:
 - `7 * * * 1-5` will execute on minute 7 of every hour, of every day of the month, of every month, monday through friday
 
 ### **User**
-Since we need root access for permission to read/write to the Network Drives, we will run this program as `root`
+Since I have saved network crednetials in the `/root` directory, we need root access for permission to read/write to the Network Drives. We will run these commands as `root`.
 
 ### **Command**
 Consider this command in the `crontab`:
