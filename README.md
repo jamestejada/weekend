@@ -124,7 +124,7 @@ All of the above, but *automatically*.
     ```
     $ sudo mount -a
     ```
-        
+
 1. Create Virtual Environment (in project directory)
     ```
     $ ./environ
@@ -256,6 +256,7 @@ To add a new show for download/processing, three things must be changed.
                 'music_bed_b': '17982'
                 # 'music_bed_c': 'NOT USED'
             }
+
         class Latino_USA(Process_BASE):
             SHOW_MATCH = [str(num) for num in range(35232, 35249)]
             NUMBER_OF_SHOW_FILES = 9
@@ -280,6 +281,7 @@ To add a new show for download/processing, three things must be changed.
                 'music_bed_b': '17033',
                 'music_bed_c': '17035'
             }
+
         ```
         - SHOW_MATCH - This is a list of strings that will be matched to determine if a file is for the specific show that this class is processing
         - NUMBER_OF_SHOW_FILES - This is used for error checking. If there are too many files, an exception will be thrown so that wrong files will be stopped from entering the system. 
