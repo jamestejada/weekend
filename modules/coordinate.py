@@ -1,9 +1,11 @@
+from os import close
 from modules import download
 from modules.settings import SAT_PATH
 from modules import choose, process, satellite_process
 from modules.ftp import connect
 from colorama import Fore, Style
 from modules.download import Download_Files, Sat_Download
+from modules.logger import initialize_logger, close_logger
 
 
 EXECUTIONS = {
@@ -76,24 +78,38 @@ class Pipe_Control:
         self.process_only = process_only
         self.threading = threading
         self.dry_run = dry_run
+        self.logger = initialize_logger('PRX_WEEKEND_BOT')
+        self.logger.info(f'PROCESS ONLY: {self.process_only}')
+        self.logger.info(f'THREADING: {self.threading}')
+        self.logger.info(f'DRY RUN: {self.dry_run}')
 
     # main
     def execute(self):
         if not self.process_only:
             self.download_show_files()
         self.process_files()
+        close_logger(self.logger)
 
     def download_show_files(self):
         prx_server = connect()
+        
+        if prx_server:
+            self.logger.info('Connected to FTP')
+        else:
+            self.logger.warn('Connection could not be established')
 
         for ftp_dir, pipe_info_dict in self.EXECUTIONS.items():
             self._process_ftp_dir(prx_server, ftp_dir, pipe_info_dict)
 
+        if prx_server:
+            self.logger.info('Connection to FTP closed')
         prx_server.close()
     
     def _process_ftp_dir(self, server, ftp_dir, pipe_info):
         file_info_generator = server.mlsd(f'/{ftp_dir}')
         files_to_get = self._choose_files(ftp_dir, file_info_generator)
+
+        self.logger.info(f'Chosen Files from FTP: {files_to_get}')
 
         if files_to_get:
             self.print_show(pipe_info.get('show_name'))

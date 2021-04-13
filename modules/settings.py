@@ -2,9 +2,14 @@ import os
 import sys
 from dotenv import load_dotenv
 from pathlib import Path
+from datetime import datetime
 
 
 load_dotenv()
+
+
+def get_date_string() -> str:
+    return datetime.now().strftime('%m%d%Y')
 
 
 def check_flags(flags) -> bool:
@@ -45,3 +50,7 @@ RESET = check_flags(['reset', 'delete'])
 CLEAN = check_flags(['clean'])
 COPY = check_flags(['copy'])
 SAT = check_flags(['sat', 'satellite', 'xds'])
+
+# LOGGING
+LOG_LEVEL = os.getenv('LOG_LEVEL')
+LOG_PATH = from_cwd('logs').joinpath(f'weekend-bot-{get_date_string()}.log')
