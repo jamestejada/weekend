@@ -202,7 +202,7 @@ class Sat_Control:
         for _, pipe_info in self.SAT_EXEC.items():
             download_list = self._choose_files(pipe_info)
 
-            self.logger.debug(f'Download List: {download_list}')
+            self.logger.info(f'{pipe_info.get("show_name")} Download List: {download_list}')
 
             if download_list:
                 self.print_show(pipe_info.get('show_name'))
@@ -217,7 +217,7 @@ class Sat_Control:
             all_results.append(one_show_results)
         
         if self._all_success(all_results):
-            self.logger.debug(f'All Downloads Suceed? {self._all_success(all_results)}')
+            self.logger.info(f'All Downloads Suceed? {self._all_success(all_results)}')
             self.clear_satellite()
     
     def _all_success(self, results: list):
