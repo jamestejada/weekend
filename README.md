@@ -1,10 +1,21 @@
 # CapRadio Weekend Programming Bot
 This program automates some of the manual processes related to files for weekend programming. 
 
-## The Original 'Manual' Process
+- [The Original Process](#the-original-manual-process)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Setup](#setup)
+- [Using This Program](#using-this-program)
+    - [Regular Execution](#regular-execution)
+    - [Execution Flags](#execution-flags)
+- [Setting Up Automatic Execution Using Cron Jobs](#setting-up-automatic-execution-using-cron-jobs)
+- [Adding New Shows](#adding-new-shows-for-processing)
+
+
+## [The Original 'Manual' Process](#capradio-weekend-programming-bot)
 1. Download show files from The Public Radio Exchange (PRX) as they appear on the FTP server (this requires rechecking the FTP at regular intervals)
 1. Normalize files to -24 LUFs
-1. Rename files for ENCO Dropbox (Ingest for ENCO DAD radio automation system)
+1. Rename files for ENCO Dropbox (Ingest program for ENCO DAD radio automation system)
     - EXAMPLE: `14160_Snap Judgment SEGMENT C Mar 7.wav`
 1. Convert to mp3 (only needed for promos used by remote hosts)
 1. Rename for remote host promo folder on network drive (i.e. promos used by remote hosts during breaks)
@@ -13,13 +24,13 @@ This program automates some of the manual processes related to files for weekend
 1. BONUS TASK A: Get and convert files for show promos that hosts working remotely can use for recorded breaks.
 1. BONUS TASK B: Delete satellite files off of the backup receiver (this is so that we can keep a "hot" backup of our satellite receiver configured in the exact same way as the primary without overloading the harddrive on the receiver)
 
-![The Original Process](./images/PRX_Downloads.png)
+![The Original Process Flowchart](./images/PRX_Downloads.png)
 
-## What does this program do
+## [What Does This Program Do?](#capradio-weekend-programming-bot)
 
-All of the above, but **automatically**.
+All of the above, but *automatically*.
 
-## Features
+## [Features](#capradio-weekend-programming-bot)
 
 - Automatic file downloads
     - Based on modified date as well as episode number
@@ -32,11 +43,14 @@ All of the above, but **automatically**.
 - Deletion of files from satellite receiver
 - Threading for increased audio processing speed. (Threading allows the execution of multiple audio conversions at the same time)
 
-## Requirements
+## [Requirements](#capradio-weekend-programming-bot)
 
 ### Development Environment
 - Python 3.8.5
-- Ubuntu 20.04 LTS Server (As OS or Windows Subsystem for Linux Distrubution)
+- Ubuntu 20.04 LTS Server
+    - As [Operating System](https://ubuntu.com/tutorials/create-a-usb-stick-on-windows#1-overview)
+    - As Windows Subsystem Linux ([WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10)) Distribution from [Microsoft Store](https://www.microsoft.com/en-us/p/ubuntu-2004-lts/9n6svws3rx71?activetab=pivot:overviewtab)
+
 
 ### Dependencies
 - [ffmpeg](https://ffmpeg.org/) for audio processing
@@ -45,7 +59,7 @@ All of the above, but **automatically**.
     - python-dotenv
     - ffmpeg-normalize
 
-## Setup
+## [Setup](#capradio-weekend-programming-bot)
 
 1. Clone repository
     ```
@@ -84,20 +98,33 @@ All of the above, but **automatically**.
     ```
     - Example for WSL:
         ```
-        F:/ /mnt/foo drvfs defaults 0 0
-        B:/ /mnt/bar drvfs defaults 0 0
+        # /etc/fstab
+
+        F:/continuity/promos /mnt/promos drvfs defaults 0 0
+        B:/ /mnt/dropbox drvfs defaults 0 0
+        S:/ /mnt/satellite drvfs defaults 0 0
         ```
     - Example for Ubuntu Machine
         ```
-        //192.168.1.2/foo /mnt/foo cifs vers=2.0,credentials=/root/cred,iocharset=utf8 0 0
+        # /etc/fstab
 
-        //192.168.1.3/bar /mnt/bar cifs vers=2.0,credentials=/root/other_cred,iocharset=utf8 0 0
+        //192.168.1.2/continuity/promos /mnt/promos cifs vers=2.0,credentials=/root/cred,iocharset=utf8 0 0
+        //192.168.1.2/dropbox /mnt/dropbox cifs vers=2.0,credentials=/root/cred,iocharset=utf8 0 0
+        //192.168.1.3/satellite /mnt/satellite cifs vers=2.0,credentials=/root/other_cred,iocharset=utf8 0 0
         ```
+        ```
+        # network share credentials file
+
+        username={username}
+        password={password}
+        domain={domain}  # if needed
+        ```
+
 1. Mount Shared Drives
     ```
     $ sudo mount -a
     ```
-        
+
 1. Create Virtual Environment (in project directory)
     ```
     $ ./environ
@@ -107,7 +134,7 @@ All of the above, but **automatically**.
     (venv) $ pip install -r requirements.txt
     ```
 
-## Using This Program
+## [Using This Program](#capradio-weekend-programming-bot)
 
 This program is meant to be run using the `weekend` script. Simply run the script and it will trigger the program with any flags you enter afterward. 
 ```
@@ -146,7 +173,7 @@ Here is a list of possible flags for the program:
 - Threading [`thread`, `threading`] - using multi-threading to improve performance (for machines that are not using their full processing capacity)
 
 
-## Setting Up Automatic Execution using Cron Jobs
+## [Setting Up Automatic Execution Using Cron Jobs](#capradio-weekend-programming-bot)
 
 As mentioned before, I have set this up using a machine with Ubuntu 20.04 Server installed. I have also mounted the needed shared drives for execution so that this process can be self-contained (i.e. I will not have to execute this program on another machine). The next step was to trigger the different execution paths at different times to continuously check the FTP for new show files, and continuously check the backup Satellite reciever for new files.  
   
@@ -154,6 +181,9 @@ For this implementation I have used the crontab file located at `/etc/crontab` i
 ```
 $ sudo nano /etc/crontab
 ```
+
+If you haven't used cron jobs before, the first five columns with combinations of numbers and stars tell the machine when to execute command, the next column (in this case containing `root`) is the user as whom we will execute the command, and the following expressions are the command itself.  
+
 Here is an example of the lines I have added to this file:
 
 ```
@@ -162,7 +192,10 @@ Here is an example of the lines I have added to this file:
 7 * * * 1-5 root cd /path/to/project && bash weekend && bash weekend copy
 0 22,23 * * 0 root cd /path/to/project && bash weekend reset
 ```
-If you haven't used cron jobs before, the first five columns with combinations of numbers and stars tell the machine when to execute command, the next column (in this case containing `root`) is the user as whom we will execute the command, and the following expressions are the command itself.  
+
+1. The first line will delete all files on the satelllite reciever after grabbing promos and processing them for remote hosts at the top of every hour, Monday through Friday. 
+2. The second line will access the PRX FTP, download programs, process them, and copy them to the appropriate destinations at 7 past the top of the each hour, Monday through Friday
+3. The third line will reset the downloaded files on Sunday night (runs at 10 PM and 11 PM) in preparation for processing the next week's programs.
 
 ### **Timing Instructions**
 To check your timing instructions, you can enter them in [crontab.guru](https://crontab.guru) and get an expression in English about when your commands will execute. 
@@ -191,7 +224,7 @@ cd /path/to/project && bash weekend && bash weekend copy
 ```
 To execute this program, we will first need to navigate to the project folder `cd /path/to/project` then we use `&&` to chain another command which executes the downloading and processing `bash weekend`. After processing is done, we chain to another command which executes the program again with a `copy` flag and copies all the processed files to their destinations `&& bash weekend copy`
 
-## Adding Programs
+## [Adding New Shows For Processing](#capradio-weekend-programming-bot)
 
 ### Adding New PRX Shows
 To add a new show for download/processing, three things must be changed. 
@@ -223,6 +256,7 @@ To add a new show for download/processing, three things must be changed.
                 'music_bed_b': '17982'
                 # 'music_bed_c': 'NOT USED'
             }
+
         class Latino_USA(Process_BASE):
             SHOW_MATCH = [str(num) for num in range(35232, 35249)]
             NUMBER_OF_SHOW_FILES = 9
@@ -247,6 +281,7 @@ To add a new show for download/processing, three things must be changed.
                 'music_bed_b': '17033',
                 'music_bed_c': '17035'
             }
+
         ```
         - SHOW_MATCH - This is a list of strings that will be matched to determine if a file is for the specific show that this class is processing
         - NUMBER_OF_SHOW_FILES - This is used for error checking. If there are too many files, an exception will be thrown so that wrong files will be stopped from entering the system. 
