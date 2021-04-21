@@ -1,11 +1,12 @@
-from os import close
+from os import close, pipe
+from typing import final
 from modules import download
 from modules.settings import SAT_PATH
 from modules import choose, process, satellite_process
 from modules.ftp import connect
 from colorama import Fore, Style
 from modules.download import Download_Files, Sat_Download
-from modules.logger import initialize_logger, close_logger
+from modules.logger import initialize_logger, start_run, close_logger
 
 
 EXECUTIONS = {
@@ -73,22 +74,31 @@ class Pipe_Control:
 
     def __init__(self, process_only: bool = False, 
             threading: bool = False, dry_run: bool = False):
+        
+        self.logger = initialize_logger()
+        start_run(self.logger)
 
         self.file_process_list = []
         self.process_only = process_only
         self.threading = threading
         self.dry_run = dry_run
-        self.logger = initialize_logger('PRX_WEEKEND_BOT')
         self.logger.info(f'PROCESS ONLY: {self.process_only}')
         self.logger.info(f'THREADING: {self.threading}')
         self.logger.info(f'DRY RUN: {self.dry_run}')
 
+        for var, value in self.__dict__.items():
+            self.logger.debug(f'{var}: {value}')
+
     # main
     def execute(self):
-        if not self.process_only:
-            self.download_show_files()
-        self.process_files()
-        close_logger(self.logger)
+        try:
+            if not self.process_only:
+                self.download_show_files()
+            self.process_files()
+        except Exception as e:
+            self.logger.warn(f'EXCEPTION: {e.__class__.__name__} - {e}')
+        finally:
+            close_logger(self.logger)
 
     def download_show_files(self):
         prx_server = connect()
@@ -109,7 +119,9 @@ class Pipe_Control:
         file_info_generator = server.mlsd(f'/{ftp_dir}')
         files_to_get = self._choose_files(ftp_dir, file_info_generator)
 
-        self.logger.info(f'Chosen Files from FTP: {files_to_get}')
+        self.logger.info(
+            f'Chosen Files from FTP for {pipe_info.get("show_name")}: {files_to_get}'
+            )
 
         if files_to_get:
             self.print_show(pipe_info.get('show_name'))
@@ -163,13 +175,21 @@ class Sat_Control:
 
     def __init__(self, process_only: bool = False, 
             threading: bool = False, dry_run: bool = False):
+
+        self.logger = initialize_logger('SATELLITE')
+        start_run(self.logger)
+
         self.process_only = process_only
         self.threading = threading
         self.dry_run = dry_run
 
+        for var, value in self.__dict__.items():
+            self.logger.debug(f'{var}: {value}')
+
     def execute(self):
         self.download_show_files()
         self.process()
+        close_logger(self.logger)
 
     def download_show_files(self):
         print()
@@ -182,14 +202,22 @@ class Sat_Control:
         for _, pipe_info in self.SAT_EXEC.items():
             download_list = self._choose_files(pipe_info)
 
+            self.logger.debug(f'Download List: {download_list}')
+
             if download_list:
                 self.print_show(pipe_info.get('show_name'))
 
             download_files = Sat_Download(download_list=download_list)
             one_show_results = download_files.download_all()
+
+            self.logger.debug(
+                f'Download results for {pipe_info.get("show_name")}: {one_show_results}'
+                )
+
             all_results.append(one_show_results)
         
         if self._all_success(all_results):
+            self.logger.debug(f'All Downloads Suceed? {self._all_success(all_results)}')
             self.clear_satellite()
     
     def _all_success(self, results: list):
@@ -228,5 +256,6 @@ class Sat_Control:
     
     def clear_satellite(self):
         print(Fore.RED, 'Deleting all files from Sat Receiver...', Style.RESET_ALL)
+        self.logger.info('Deleting all files from Sat Receiver')
         for file_path in SAT_PATH.iterdir():
             file_path.unlink()

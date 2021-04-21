@@ -46,7 +46,7 @@ FORCE_PROCESS = check_flags(['force'])
 DRY_RUN = check_flags(['mock', 'dry'])
 
 CHECK = check_flags(['check', 'stat', 'status'])
-RESET = check_flags(['reset', 'delete'])
+RESET = check_flags(['reset', 'delete', 'clear'])
 CLEAN = check_flags(['clean'])
 COPY = check_flags(['copy'])
 SAT = check_flags(['sat', 'satellite', 'xds'])
@@ -54,3 +54,4 @@ SAT = check_flags(['sat', 'satellite', 'xds'])
 # LOGGING
 LOG_LEVEL = os.getenv('LOG_LEVEL')
 LOG_PATH = from_cwd('logs').joinpath(f'weekend-bot-{get_date_string()}.log')
+LOG_NAME = 'PRX_WEEKEND_BOT'

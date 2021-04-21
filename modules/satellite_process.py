@@ -11,7 +11,7 @@ class Process_Satellite_BASE(Process_BASE):
     # override
     def process_for_ffa(self, key='promo'):
         super().process_for_ffa(key=key)
-        # process then delete source in for_dropbox
+        # process then delete source in 'for_dropbox'
         # (it already delivers via satellite)
         dropbox_file_path = self.destination_paths.get(key)
         download_path = self.source_paths.get(key)

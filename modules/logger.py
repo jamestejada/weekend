@@ -1,23 +1,27 @@
-from modules.settings import LOG_LEVEL, LOG_PATH
+from os import device_encoding
+from modules.settings import LOG_LEVEL, LOG_PATH, LOG_NAME
 import logging
+
 
 LOGGER_LEVEL = {
     'debug': logging.DEBUG,
     'info': logging.INFO
 }.get(LOG_LEVEL)
 
-def initialize_logger(logger_name: str):
+
+def initialize_logger(logger_name: str = None):
     logging.basicConfig(
+        format='%(asctime)s %(name)s %(levelname)s: %(message)s',
+        datefmt='%H:%M:%S',
         filename=LOG_PATH, 
         filemode='a',
-        format='%(asctime)s %(name)s %(level)s %(message)s',
-        datefmt='%H:%M:%S',
         level=LOGGER_LEVEL
     )
-    logger = logging.getLogger(logger_name)
+    return logging.getLogger(name=f'{LOG_NAME}:{logger_name}' if logger_name else LOG_NAME)
+
+def start_run(logger):
     logger.info('---RUN STARTED---')
-    return logger
 
 def close_logger(logger):
     logger.info('---RUN FINISHED---')
-    
+

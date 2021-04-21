@@ -1,3 +1,4 @@
+from modules.logger import initialize_logger
 from colorama import Fore, Style
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
@@ -27,6 +28,8 @@ class Process_BASE:
         self, process_list=None, sample_rate=44100, target_level=-24.0,
         true_peak=-3.0, bitrate='256k', threading=False
         ):
+        self.logger = initialize_logger(self.__class__.__name__)
+
         self.show_string = str(self.__class__.__name__).replace('_', ' ')
         self.air_days_string = self.get_days_string()
 
@@ -43,6 +46,9 @@ class Process_BASE:
         self.sample_rate = sample_rate
         self.true_peak = true_peak
         self.bitrate = bitrate
+
+        for var, value in self.__dict__.items():
+            self.logger.debug(f'{var}: {value}')
 
     # main
     def process(self):
@@ -193,6 +199,7 @@ class Process_BASE:
         except AssertionError as e:
             print(Fore.RED, Style.BRIGHT, 'ERROR: ', e, Style.RESET_ALL)
             print('\n'.join(file_name.name for file_name in directory_list))
+            self.logger.warn(f'ERROR: {e}')
             return []
         return downloaded_list if process_list else directory_list
 

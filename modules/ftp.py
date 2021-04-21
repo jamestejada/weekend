@@ -1,3 +1,4 @@
+from modules.logger import initialize_logger
 from colorama import Fore, Style
 from modules.settings import PRX
 from ftplib import FTP
@@ -7,6 +8,10 @@ TIME_OUT = 3
 
 
 def connect(n=1):
+    logger = initialize_logger('FTP')
+    logger.debug(f'TIME_OUT = {TIME_OUT}')
+    logger.debug(f'n = {n}')
+
     if n > TIME_OUT:
         return
 

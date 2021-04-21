@@ -1,3 +1,4 @@
+from modules.logger import initialize_logger
 import time
 from datetime import datetime, timedelta
 from modules.settings import LOCAL_PATH
@@ -9,6 +10,8 @@ class Chooser:
     def __init__(self, 
         file_info_generator=None, which_file_set='latest', 
         local_list=None, dry_run=False):
+        
+        self.logger = initialize_logger(self.__class__.__name__)
 
         self.local_list = local_list
         self.dry_run = dry_run
@@ -24,6 +27,10 @@ class Chooser:
         
         self.files_in_date_range = self.get_files_in_date_range(self.all_files)
         self.episode = self.get_episode(self.files_in_date_range)
+
+        for var, value in self.__dict__.items():
+            self.logger.debug(f'{var}: {value}')
+
 
     # main
     def files_to_get(self):

@@ -1,5 +1,6 @@
 from pathlib import Path
 from modules.settings import LOCAL_PATH, DRY_RUN, SAT_PATH
+from modules.logger import initialize_logger
 from colorama import Style, Fore
 import shutil
 
@@ -9,10 +10,16 @@ class Download_Files:
     LOCAL_PATH = LOCAL_PATH
 
     def __init__(self, server, remote_dir: str, download_list: list):
+        self.logger = initialize_logger(self.__class__.__name__)
+        
         self.download_list = download_list
         self.remote_dir = remote_dir
         self.server = server
         self.dry_run = DRY_RUN
+
+        for var, value in self.__dict__.items():
+            self.logger.debug(f'{var}: {value}')
+
     
     def download_all(self):
         for each_file in self.download_list:
@@ -39,15 +46,22 @@ class Sat_Download:
     SAT_PATH = SAT_PATH
 
     def __init__(self, download_list: list):
+
+        self.logger = initialize_logger(self.__class__.__name__)
+
         self.download_list = download_list
         self.dry_run = DRY_RUN
-    
+
+        for var, value in self.__dict__.items():
+            self.logger.debug(f'{var}: {value}')
+
     def download_all(self):
         results = []
         for each_file in self.download_list:
             which_function = print if self.dry_run else self.download_one
             result = which_function(each_file)
             results.append(True if self.dry_run else result)
+        self.logger.debug(f'download results: {results}')
         return results
     
     def download_one(self, one_file) -> bool:
