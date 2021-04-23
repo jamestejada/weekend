@@ -35,6 +35,7 @@ FOR_FFA = from_cwd('files', 'for_ffa')
 
 DROPBOX_PATH = Path(os.getenv('DROPBOX_MOUNT'))
 FFA_PATH = Path(os.getenv('FFA_MOUNT')).joinpath('- Corona Continuity Breaks -', 'Promos')
+SLACK_WEBHOOK=os.getenv('SLACK_WEBHOOK')
 
 RESET_DIRS = [LOCAL_PATH, FOR_DROPBOX, FOR_FFA]
 
@@ -50,6 +51,7 @@ RESET = check_flags(['reset', 'delete', 'clear'])
 CLEAN = check_flags(['clean'])
 COPY = check_flags(['copy'])
 SAT = check_flags(['sat', 'satellite', 'xds'])
+SLACK = check_flags(['slack', 'bot'])
 
 # LOGGING
 LOG_LEVEL = os.getenv('LOG_LEVEL')
