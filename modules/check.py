@@ -91,7 +91,6 @@ def request_handler(missing_segment_dict: dict, logger=None):
             ]
         }
     """
-
     show_name = list(missing_segment_dict.keys())[0]
     missing_list = missing_segment_dict.get(show_name)
 

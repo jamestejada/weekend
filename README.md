@@ -65,6 +65,9 @@ All of the above, but *automatically*.
     ```
     $ git clone https://github.com/jamestejada/weekend.git
     ```
+
+1. Setup a Slack Webhook (if you'd like slack notifications about which files have not been delivered yet). The instructions for setup can be found [here](Slack_Setup.md#slack-workflow-setup).
+
 1. Create a `.env` file in the modules folder with the following environment variable assignments (NOTE: Do not use quotes around the paths)
     - Mount paths
         - `SAT_MOUNT=/path/to/satellite/share`
@@ -78,6 +81,14 @@ All of the above, but *automatically*.
         - `PRX_IP={FTP_SERVER_ADDRESS}`
         - `PRX_USERNAME={USERNAME}`
         - `PRX_PASSWORD={PASSWORD}`
+    
+    - The Desired Logging Level
+        - `LOG_LEVEL=info`
+        - `LOG_LEVEL=debug`
+    
+    - The slack workflow webhook for slack integration. 
+        - `SLACK_WEBHOOK=https://hooks.slack.com/workflows/{SECRET_STRING}`
+
 1. Create mount paths for satellite, dropbox, remote host network shares. Make sure they are the same paths you set in the `.env` file.
     - EXAMPLE: 
         ```
