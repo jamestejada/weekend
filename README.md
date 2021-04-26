@@ -338,6 +338,24 @@ To add a new show for download/processing, three things must be changed.
     - `chooser` - desired `Chooser` class (default is `choose.Chooser`)
     - `processor` - desired processing class
 
+1. Add to a checking class(`./modules/check.py`)
+    - The `Check_BASE` class inherits from the `Process_BASE` class allowing `Check_BASE` to use the same class variables and methods for each show class(e.g. `process.Reveal`, `process.This_American_Life`). 
+    - You will need to add a class for the show by inheriting from both `Check_BASE` and the process class for the show you are adding. For example:
+    ```python
+    class Reveal(Check_BASE, process.Reveal): ...
+    class Latino_USA(Check_BASE, process.Latino_USA): ...
+    ```
+    - Yup, you only the ellipses after it because both classes together have all the methods you will need. 
+    - You will then need to add the class to the `CHECK_SHOWS` list in the check module.
+    ```python
+    CHECK_SHOWS = [
+        Reveal,
+        Latino_USA,
+        Says_You,
+        ...
+    ]
+    ```
+
 ### Adding New Satellite Promos
 For new promos processed from the satellite receiver, only two things need to be changed
 
