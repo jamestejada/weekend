@@ -70,7 +70,7 @@ class Pipe_Control:
     """This class coordinates choosing, downloading and processing
     of various show files."""
     EXECUTIONS = EXECUTIONS
-    GET_OLDER_FILES = ['RevealWk']
+    GET_OLDER_FILES = ['RevealWk', 'THEMOTH']
 
     def __init__(self, process_only: bool = False, 
             threading: bool = False, dry_run: bool = False):
