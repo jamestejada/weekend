@@ -66,7 +66,7 @@ All of the above, but *automatically*.
     $ git clone https://github.com/jamestejada/weekend.git
     ```
 
-1. Setup a Slack Webhook (if you'd like slack notifications about which files have not been delivered yet). The instructions for setup can be found [here](Slack_Setup.md#slack-workflow-setup).
+1. Setup a Slack Webhook (if you'd like slack notifications about which files have not been delivered yet). The instructions for setup can be found [here](./documentation/Slack_Setup.md#slack-workflow-setup).
 
 1. Create a `.env` file in the modules folder with the following environment variable assignments (NOTE: Do not use quotes around the paths)
     - Mount paths
