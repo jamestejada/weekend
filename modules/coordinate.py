@@ -109,7 +109,9 @@ class Pipe_Control:
             self.logger.warn('Connection could not be established')
 
         for ftp_dir, pipe_info_dict in self.EXECUTIONS.items():
+            print(f'Checking {ftp_dir} on PRX server', end="\r")
             self._process_ftp_dir(prx_server, ftp_dir, pipe_info_dict)
+            print(' '*40, end='\r')
 
         if prx_server:
             self.logger.info('Connection to FTP closed')
