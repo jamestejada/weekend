@@ -22,7 +22,6 @@ class Process_BASE:
     LOCAL_PATH = LOCAL_PATH
     FOR_DROPBOX = FOR_DROPBOX
     FOR_FFA = FOR_FFA
-    FORCE = FORCE_PROCESS
 
     def __init__(
         self, process_list=None, sample_rate=44100, target_level=-24.0,
@@ -41,6 +40,7 @@ class Process_BASE:
 
         self.threading = threading
         self.dry_run = DRY_RUN
+        self.force = FORCE_PROCESS
 
         self.target_level = target_level
         self.sample_rate = sample_rate
@@ -103,7 +103,7 @@ class Process_BASE:
         return all([
             destination, 
             destination.exists(),
-            not self.FORCE,
+            not self.force,
             not self.process_list
         ])
 

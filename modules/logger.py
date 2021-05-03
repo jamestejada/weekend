@@ -1,4 +1,3 @@
-from os import device_encoding
 from modules.settings import LOG_LEVEL, LOG_PATH, LOG_NAME
 import logging
 
