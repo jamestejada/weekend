@@ -42,6 +42,7 @@ All of the above, but *automatically*.
 - Copying files appropriate destinations (i.e. ENCO Dropbox, or Continuity Folder)
 - Deletion of files from satellite receiver
 - Threading for increased audio processing speed. (Threading allows the execution of multiple audio conversions at the same time)
+- Slack notifications through [webhook workspace integration](./documentation/Slack_Setup.md#slack-workflow-setup).
 
 ## [Requirements](#capradio-weekend-programming-bot)
 
@@ -58,6 +59,7 @@ All of the above, but *automatically*.
 - libraries:
     - python-dotenv
     - ffmpeg-normalize
+    - requests
 
 ## [Setup](#capradio-weekend-programming-bot)
 

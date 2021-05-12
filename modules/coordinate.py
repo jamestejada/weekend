@@ -1,8 +1,5 @@
-from os import close, pipe
-from typing import final
-from modules import download
 from modules.settings import SAT_PATH
-from modules import choose, process, satellite_process
+from modules import choose, process, satellite_process, verify
 from modules.ftp import connect
 from colorama import Fore, Style
 from modules.download import Download_Files, Sat_Download
@@ -82,6 +79,9 @@ class Pipe_Control:
         self.process_only = process_only
         self.threading = threading
         self.dry_run = dry_run
+
+        self.verifier_class = verify.Verify
+
         self.logger.info(f'PROCESS ONLY: {self.process_only}')
         self.logger.info(f'THREADING: {self.threading}')
         self.logger.info(f'DRY RUN: {self.dry_run}')
@@ -120,6 +120,10 @@ class Pipe_Control:
     def _process_ftp_dir(self, server, ftp_dir, pipe_info):
         file_info_generator = server.mlsd(f'/{ftp_dir}')
         files_to_get = self._choose_files(ftp_dir, file_info_generator)
+
+        verifier = self.verifier_class(server, ftp_dir, pipe_info.get('processor'))
+        for corrupted_file in verifier.check_hashes():
+            files_to_get.append(corrupted_file)
 
         self.logger.info(
             f'Chosen Files from FTP for {pipe_info.get("show_name")}: {files_to_get}'

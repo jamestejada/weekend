@@ -28,16 +28,25 @@ class PRX:
     PASSWORD = os.getenv('PRX_PASSWORD')
 
 
-SAT_PATH = Path(os.getenv('SAT_MOUNT'))
+SAT_PATH = Path(os.getenv('SAT_MOUNT') or from_cwd('fake_sat_mount'))
 LOCAL_PATH = from_cwd('files', 'downloads')
 FOR_DROPBOX = from_cwd('files', 'for_dropbox')
 FOR_FFA = from_cwd('files', 'for_ffa')
 
-DROPBOX_PATH = Path(os.getenv('DROPBOX_MOUNT'))
-FFA_PATH = Path(os.getenv('FFA_MOUNT')).joinpath('- Corona Continuity Breaks -', 'Promos')
+DROPBOX_PATH = Path(os.getenv('DROPBOX_MOUNT') or from_cwd('fake_dropbox_mount'))
+FFA_MOUNT = Path(os.getenv('FFA_MOUNT') or from_cwd('fake_ffa_mount'))
+FFA_PATH = FFA_MOUNT.joinpath('- Corona Continuity Breaks -', 'Promos')
+FFA_PATH.mkdir(exist_ok=True, parents=True)
 SLACK_WEBHOOK=os.getenv('SLACK_WEBHOOK')
 
-RESET_DIRS = [LOCAL_PATH, FOR_DROPBOX, FOR_FFA]
+RESET_DIRS = [
+    LOCAL_PATH,
+    FOR_DROPBOX,
+    FOR_FFA,
+    from_cwd('fake_dropbox_mount'),
+    from_cwd('fake_ffa_mount'),
+    from_cwd('fake_sat_mount')
+]
 
 
 # Execution Path Flags

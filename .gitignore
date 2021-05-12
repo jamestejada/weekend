@@ -8,3 +8,6 @@ for_dropbox
 for_ffa
 files
 logs
+fake_dropbox_mount
+fake_ffa_mount
+fake_sat_mount
