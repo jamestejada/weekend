@@ -32,11 +32,15 @@ All of the above, but *automatically*.
 
 ## [Features](#capradio-weekend-programming-bot)
 
-- Automatic file downloads
-    - Based on modified date as well as episode number
+- Downloading of files
+    - FTP Login
+    - Selection of files based on modified date as well as episode number
     - Satellite files are downloaded as well
-- Automatic renaming of files based on air date, destination and show
-- Automatic processing of files
+- Verification of files
+    - MD5 checksum ensures files are not corrupted during download.
+    - **\*COMING SOON\*** - Segment Length verification
+- Renaming of files based on air date, destination and show
+- Processing of files
     - Normalization to industry standard (-24 LUFs)
     - mp3 conversion for promos
 - Copying files appropriate destinations (i.e. ENCO Dropbox, or Continuity Folder)

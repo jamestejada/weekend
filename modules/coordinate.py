@@ -80,7 +80,7 @@ class Pipe_Control:
         self.threading = threading
         self.dry_run = dry_run
 
-        self.verifier_class = verify.Verify
+        self.verifier_class = verify.Verifier
 
         self.logger.info(f'PROCESS ONLY: {self.process_only}')
         self.logger.info(f'THREADING: {self.threading}')
@@ -114,16 +114,19 @@ class Pipe_Control:
             print(' '*40, end='\r')
 
         if prx_server:
+            prx_server.close()
             self.logger.info('Connection to FTP closed')
-        prx_server.close()
     
     def _process_ftp_dir(self, server, ftp_dir, pipe_info):
+        verifier = self.verifier_class(
+            server, ftp_dir, processor_class=pipe_info.get('processor')
+            )
         file_info_generator = server.mlsd(f'/{ftp_dir}')
-        files_to_get = self._choose_files(ftp_dir, file_info_generator)
 
-        verifier = self.verifier_class(server, ftp_dir, pipe_info.get('processor'))
-        for corrupted_file in verifier.check_hashes():
-            files_to_get.append(corrupted_file)
+        files_to_get = [
+            *self._choose_files(ftp_dir, file_info_generator),
+            *verifier.check_hashes()
+            ]
 
         self.logger.info(
             f'Chosen Files from FTP for {pipe_info.get("show_name")}: {files_to_get}'
@@ -136,7 +139,7 @@ class Pipe_Control:
         download_files.download_all()
     
     def print_show(self, show_name):
-        print()
+        print(' '*40, end='\r')
         print(Fore.CYAN, f'-{show_name}-', Style.RESET_ALL)
 
     def _choose_files(self, ftp_dir, file_info_generator):

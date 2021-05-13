@@ -1,43 +1,64 @@
 from pathlib import Path
 from modules.settings import LOCAL_PATH, DRY_RUN, SAT_PATH
 from modules.logger import initialize_logger
+from modules.verify import Verifier
 from colorama import Style, Fore
 import shutil
 
 
-class Download_Files:
+class Download_Files(Verifier):
 
     LOCAL_PATH = LOCAL_PATH
 
-    def __init__(self, server, remote_dir: str, download_list: list):
+    def __init__(self, ftp_server, remote_dir: str, download_list: list):
         self.logger = initialize_logger(self.__class__.__name__)
         
+        super().__init__(ftp_server, remote_dir)
         self.download_list = download_list
-        self.remote_dir = remote_dir
-        self.server = server
+        # self.remote_dir = remote_dir
+        # self.ftp_server = ftp_server
         self.dry_run = DRY_RUN
 
         for var, value in self.__dict__.items():
-            self.logger.debug(f'{var}: {value}')
+            self.logger.debug(f'{var.upper()}: {value}')
 
     
     def download_all(self):
         for each_file in self.download_list:
             which_function = print if self.dry_run else self.download_one
             which_function(each_file)
+        self._write_cached_hashes()
 
     def download_one(self, one_file):
         full_path = self.LOCAL_PATH.joinpath(one_file)
+        retr_string = f'RETR /{self.remote_dir}/{one_file}'
 
         with open(full_path, 'wb') as out_file:
             print(f'Downloading {one_file}...', end='', flush=True)
-            result = self.server.retrbinary(
-                f'RETR /{self.remote_dir}/{one_file}', out_file.write
+            result = self.ftp_server.retrbinary(retr_string, out_file.write)
+            success = ('226' in result) and (
+                self.hash_local(one_file) == self.hash_remote(one_file)
                 )
-            success = '226' in result
-            color = Fore.GREEN if success else Fore.RED
-            print(color, 'SUCCESS' if success else 'FAILED', Style.RESET_ALL)
+            color, message = (
+                    Fore.GREEN, 'DOWNLOADED and VERIFIED'
+                ) if success else (
+                    Fore.RED, 'FAILED'
+                    )
+            
+            print(color, message, Style.RESET_ALL)
+            log_func = self.logger.debug if success else self.logger.warning
+            log_func(f'{one_file}: {message}')
+
             return success
+
+    # override
+    def in_cache(self, file_name):
+        # We want this function to alwyas return false within the 
+        # Download_Files class because we want all newly downloaded files
+        # To store a new hash in the hash cache when self.hash_remote is called.
+        return False
+    
+
 
 
 class Sat_Download:
