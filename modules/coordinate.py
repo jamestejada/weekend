@@ -80,7 +80,7 @@ class Pipe_Control:
         self.threading = threading
         self.dry_run = dry_run
 
-        self.verifier_class = verify.Verifier
+        self.verifier_class = verify.Hash_Verifier
 
         self.logger.info(f'PROCESS ONLY: {self.process_only}')
         self.logger.info(f'THREADING: {self.threading}')

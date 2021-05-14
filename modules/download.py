@@ -1,12 +1,12 @@
 from pathlib import Path
 from modules.settings import LOCAL_PATH, DRY_RUN, SAT_PATH
 from modules.logger import initialize_logger
-from modules.verify import Verifier
+from modules.verify import Hash_Verifier
 from colorama import Style, Fore
 import shutil
 
 
-class Download_Files(Verifier):
+class Download_Files(Hash_Verifier):
 
     LOCAL_PATH = LOCAL_PATH
 
@@ -44,7 +44,7 @@ class Download_Files(Verifier):
                 ) if success else (
                     Fore.RED, 'FAILED'
                     )
-            
+
             print(color, message, Style.RESET_ALL)
             log_func = self.logger.debug if success else self.logger.warning
             log_func(f'{one_file}: {message}')
