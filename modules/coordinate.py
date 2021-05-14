@@ -127,11 +127,17 @@ class Pipe_Control:
         verifier = self.hash_verifier_class(
             server, ftp_dir, processor_class=pipe_info.get('processor')
             )
+        corrupted_files = verifier.check_hashes()
         file_info_generator = server.mlsd(f'/{ftp_dir}')
+
+        if corrupted_files:
+            self.logger.warn(
+                f'CORRUPTED FILES TO BE RE-DOWNLOADED: {corrupted_files}'
+                )
 
         files_to_get = [
             *self._choose_files(ftp_dir, file_info_generator),
-            *verifier.check_hashes()
+            *corrupted_files
             ]
 
         self.logger.info(
@@ -196,10 +202,12 @@ class Pipe_Control:
         mistimed_files = length_verifier_class().verify_show()
         if mistimed_files:
             self._delete_bad_files(mistimed_files)
+            self.logger.warn('Retrying processing')
             self._process_one_show(pipe_info.get('processor'), any_file_mistimed=True)
 
     def _delete_bad_files(self, bad_files: list) -> None:
         for bad_file in bad_files:
+            self.logger.warn(f'{bad_file.name} is not timed correctly and will be removed.')
             bad_file.unlink()
 
 
