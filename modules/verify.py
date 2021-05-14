@@ -81,19 +81,19 @@ class Segment_Verifier:
     # pass time verification if not all segments are there.
     # use check class?
 
+    # Main
     def verify_show(self) -> list:
-        print(self.__class__.__name__)
         mistimed_files = []
         for wav_file in self.PROCESSED_DIR.iterdir():
             cut_number = self._get_cut_number(wav_file)
             if cut_number in self.TIMINGS.keys():
                 if not self.is_correct_timing(wav_file):
-                    mistimed_files.append(wav_file.name)                    
+                    mistimed_files.append(wav_file)                    
             if cut_number in self.ADD:
                 self.add_list.append(wav_file)
         if not self.is_added_segments_timing_correct(self.add_list):
             for segment in self.add_list:
-                mistimed_files.append(segment.name)
+                mistimed_files.append(segment)
         return mistimed_files
     
     def is_added_segments_timing_correct(self, add_list: list) -> bool:

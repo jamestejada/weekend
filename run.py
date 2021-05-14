@@ -63,9 +63,11 @@ def clean_directories():
     """
     for directory in RESET_DIRS:
         for path in directory.iterdir():
-            if path.suffix not in ['.wav', '.mp3']:
-                path.unlink()
-
+            if path.suffix not in ['.wav', '.mp3', '.json']:
+                try:
+                    path.unlink(missing_ok=True)
+                except IsADirectoryError:
+                    pass
 
 
 if __name__ == '__main__':

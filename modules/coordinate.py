@@ -10,32 +10,38 @@ EXECUTIONS = {
     'LatinoUS': {
         'show_name': 'Latino USA',
         'chooser': choose.Chooser_Latino_USA,
-        'processor': process.Latino_USA
+        'processor': process.Latino_USA,
+        'verifier': verify.Latino_USA
     },
     'RevealWk': {
         'show_name': 'Reveal',
         'chooser': choose.Chooser_Reveal,
-        'processor': process.Reveal
+        'processor': process.Reveal,
+        'verifier': verify.Reveal
     },
     'SaysYou1': {
         'show_name': 'Says You',
         'chooser': choose.Chooser,
-        'processor': process.Says_You
+        'processor': process.Says_You,
+        'verifier': verify.Says_You
     },
     'SnapJudg': {
         'show_name': 'Snap Judgment',
         'chooser': choose.Chooser_Snap_Judgment,
-        'processor': process.Snap_Judgment
+        'processor': process.Snap_Judgment,
+        'verifier': verify.Snap_Judgment
     },
     'THEMOTH': {
         'show_name': 'The Moth',
         'chooser': choose.Chooser,
-        'processor': process.The_Moth
+        'processor': process.The_Moth,
+        'verifier': verify.The_Moth
     },
     'ThisAmer': {
         'show_name': 'This American Life',
         'chooser': choose.Chooser_TAL,
-        'processor': process.This_American_Life
+        'processor': process.This_American_Life,
+        'verifier': verify.This_American_Life
     }
 }
 
@@ -80,7 +86,7 @@ class Pipe_Control:
         self.threading = threading
         self.dry_run = dry_run
 
-        self.verifier_class = verify.Hash_Verifier
+        self.hash_verifier_class = verify.Hash_Verifier
 
         self.logger.info(f'PROCESS ONLY: {self.process_only}')
         self.logger.info(f'THREADING: {self.threading}')
@@ -118,7 +124,7 @@ class Pipe_Control:
             self.logger.info('Connection to FTP closed')
     
     def _process_ftp_dir(self, server, ftp_dir, pipe_info):
-        verifier = self.verifier_class(
+        verifier = self.hash_verifier_class(
             server, ftp_dir, processor_class=pipe_info.get('processor')
             )
         file_info_generator = server.mlsd(f'/{ftp_dir}')
@@ -167,16 +173,34 @@ class Pipe_Control:
         return file_get_list
 
     def process_files(self):
+        self._print_processing_message()
+        for _, pipe_info_dict in self.EXECUTIONS.items():
+            self.print_show(pipe_info_dict.get('show_name'))
+            self._process_one_show(pipe_info_dict.get('processor'))
+            self._verify_processed_files(pipe_info_dict)
+
+    def _print_processing_message(self):
         print()
         print(Fore.YELLOW, 'PROCESSING...', Style.RESET_ALL)
 
-        for _, pipe_info_dict in self.EXECUTIONS.items():
-            self.print_show(pipe_info_dict.get('show_name'))
-            show_class = pipe_info_dict.get('processor')
-            show = show_class(
-                threading=self.threading, process_list=self.file_process_list
-                )
-            show.process()
+    def _process_one_show(self, processor_class, any_file_mistimed=False):
+        """Instantiates a processor class and runs the process() method"""
+        process_list = None if any_file_mistimed else self.file_process_list
+        processor_class(process_list=process_list, threading=self.threading).process()
+
+    def _verify_processed_files(self, pipe_info: dict) -> None:
+        """Verifies processed file lengths. If any processed files are not the correct
+        length, the files are deleted and reprocessed. 
+        """
+        length_verifier_class = pipe_info.get('verifier')
+        mistimed_files = length_verifier_class().verify_show()
+        if mistimed_files:
+            self._delete_bad_files(mistimed_files)
+            self._process_one_show(pipe_info.get('processor'), any_file_mistimed=True)
+
+    def _delete_bad_files(self, bad_files: list) -> None:
+        for bad_file in bad_files:
+            bad_file.unlink()
 
 
 class Sat_Control:
