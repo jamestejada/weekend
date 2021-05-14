@@ -3,7 +3,6 @@ from hashlib import md5
 from mutagen.wave import WAVE
 from modules.settings import LOCAL_PATH, FOR_DROPBOX
 
-# next add a check in 'for_dropbox' folder for proper show lengths
 
 class Hash_Verifier:
     LOCAL_PATH = LOCAL_PATH
@@ -82,30 +81,31 @@ class Segment_Verifier:
     # pass time verification if not all segments are there.
     # use check class?
 
-    def verify_show(self):
+    def verify_show(self) -> list:
         print(self.__class__.__name__)
         mistimed_files = []
         for wav_file in self.PROCESSED_DIR.iterdir():
             cut_number = self._get_cut_number(wav_file)
             if cut_number in self.TIMINGS.keys():
                 if not self.is_correct_timing(wav_file):
-                    mistimed_files.append(wav_file.name)
-                    # append to file_name to output list
-                    # to reprocess?
-                    print(wav_file.name, 'is not good')
+                    mistimed_files.append(wav_file.name)                    
             if cut_number in self.ADD:
                 self.add_list.append(wav_file)
-        print(self.add_segments())
+        if not self.is_added_segments_timing_correct(self.add_list):
+            for segment in self.add_list:
+                mistimed_files.append(segment.name)
+        return mistimed_files
     
-    def add_segments(self):
-        if len(self.add_list) != len(self.ADD):
+    def is_added_segments_timing_correct(self, add_list: list) -> bool:
+        if len(add_list) != len(self.ADD):
             # If not all added segment files are delivered, 
             # we can't compare times.
             return True
-        sum_in_secs = sum([self._get_length(wav_file) for wav_file in self.add_list])
+        sum_in_secs = sum([self._get_length(wav_file) for wav_file in add_list])
         return self.compare_time(self.ADD_TIME_TARGET, sum_in_secs)
     
     def compare_time(self, target_time: int, actual_time: int):
+        """Checks if actual time is within tolerances of target time"""
         upper_limit = target_time + self.UPPER_TOLERANCE
         lower_limit = target_time - self.LOWER_TOLERANCE
         return lower_limit <= actual_time <= upper_limit
@@ -137,7 +137,7 @@ class Reveal(Segment_Verifier):
     ]
 
 
-class Latino_USA:
+class Latino_USA(Segment_Verifier):
     TIMINGS = {
         '75292': 30,
         '17030': 60,
@@ -153,7 +153,7 @@ class Latino_USA:
     ]
 
 
-class Says_You:
+class Says_You(Segment_Verifier):
     TIMINGS = {
         '27305': 30,
         '27300': 60
@@ -165,7 +165,8 @@ class Says_You:
         '27303'
     ]
 
-class The_Moth:
+
+class The_Moth(Segment_Verifier):
     TIMINGS = {
         '14172': 30,
         '14166': 60,
@@ -180,7 +181,7 @@ class The_Moth:
     ]
 
 
-class Snap_Judgment:
+class Snap_Judgment(Segment_Verifier):
     TIMINGS = {
         '14161': 30,
         '14155': 60,
@@ -195,7 +196,7 @@ class Snap_Judgment:
     ]
 
 
-class This_American_Life:
+class This_American_Life(Segment_Verifier):
     TIMINGS = {
         '25321': 30,
         '17041': 60
