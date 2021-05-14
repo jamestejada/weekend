@@ -100,6 +100,7 @@ class Pipe_Control:
         try:
             if not self.process_only:
                 self.download_show_files()
+            self.logger.info(f'Files to be Processed: {self.file_process_list}')
             self.process_files()
         except Exception as e:
             self.logger.warn(f'EXCEPTION: {e.__class__.__name__} - {e}')
@@ -108,11 +109,10 @@ class Pipe_Control:
 
     def download_show_files(self):
         prx_server = connect()
-        
-        if prx_server:
-            self.logger.info('Connected to FTP')
-        else:
-            self.logger.warn('Connection could not be established')
+
+        message_level = self.logger.info if prx_server else self.logger.warn
+        message = 'Connected to FTP' if prx_server else 'Connection could not be established'
+        message_level(message)
 
         for ftp_dir, pipe_info_dict in self.EXECUTIONS.items():
             print(f'Checking {ftp_dir} on PRX server', end="\r")
