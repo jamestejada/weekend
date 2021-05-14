@@ -67,6 +67,8 @@ def clean_directories():
                 try:
                     path.unlink(missing_ok=True)
                 except IsADirectoryError:
+                    # This is just for fake_ffa_mount directory
+                    # which contains another directory
                     pass
 
 
