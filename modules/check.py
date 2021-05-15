@@ -43,7 +43,10 @@ class Check_BASE(process.Process_BASE):
     def __str__(self):
         return self.__class__.__name__.replace('_', ' ')
 
-
+# NOTE: Check_BASE inherits from Process_BASE, and then the 
+#       show checking classes below inherit from the show processing
+#       classes, which inherit from Process_BASE also. 
+# TO DO: test if you don't need to inherit from process.Process_BASE.
 class Reveal(Check_BASE, process.Reveal): ...
 class Latino_USA(Check_BASE, process.Latino_USA): ...
 class Says_You(Check_BASE, process.Says_You): ...

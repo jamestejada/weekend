@@ -38,7 +38,7 @@ All of the above, but *automatically*.
     - Satellite files are downloaded as well
 - Verification of files
     - MD5 checksum ensures files are not corrupted during download.
-    - **\*COMING SOON\*** - Segment Length verification
+    - Segment Length verification
 - Renaming of files based on air date, destination and show
 - Processing of files
     - Normalization to industry standard (-24 LUFs)
@@ -244,7 +244,7 @@ To execute this program, we will first need to navigate to the project folder `c
 ## [Adding New Shows For Processing](#capradio-weekend-programming-bot)
 
 ### Adding New PRX Shows
-To add a new show for download/processing, three things must be changed. 
+To add a new show for download/processing, a few things must be changed. 
 1. Processing Class
     - The processing base class has been designed so that adding a new show will only involve inheriting from `Process_BASE` and setting class variables.
     - Example:
@@ -339,13 +339,15 @@ To add a new show for download/processing, three things must be changed.
             'RevealWk': {
                 'show_name': 'Reveal',
                 'chooser': choose.Chooser_Reveal,
-                'processor': process.Reveal
+                'processor': process.Reveal,
+                'verifier': verify.Reveal
             },
             # each entry into the EXECUTIONS dictionary is of form:
             ftp_directory_name: {
                 'show_name': show_name,
                 'chooser': choose.Chooser, # default Chooser
-                'processor': process.Show_Process_Class
+                'processor': process.Show_Process_Class,
+                'verifier': verify.Show_Verification_Class
             },
             ...
         }
@@ -354,6 +356,7 @@ To add a new show for download/processing, three things must be changed.
     - `show_name` - yes.....the name of the show in string form
     - `chooser` - desired `Chooser` class (default is `choose.Chooser`)
     - `processor` - desired processing class
+    - `verifier` - The segment length verification class for the show. 
 
 1. Add to a checking class(`./modules/check.py`)
     - The `Check_BASE` class inherits from the `Process_BASE` class allowing `Check_BASE` to use the same class variables and methods for each show class(e.g. `process.Reveal`, `process.This_American_Life`). 
@@ -372,6 +375,27 @@ To add a new show for download/processing, three things must be changed.
         ...
     ]
     ```
+1. Add a segment length verification sub-class of `Segment_Verifier` (`./modules.verify`)
+    - the `Segment_Verifier` class is the base class for checking that lengths are correct for the post-processing files meant for the ENCO Dropbox. 
+    - You will need to create a new class that inherits from `Segment_Verifier`
+    ```python
+    class Reveal(Segment_Verifier):
+        TIMINGS = {
+            '17984': 30,
+            '17978': 60,
+            '17980': 60,
+            '17982': 60
+        }
+        ADD_TIME_TARGET = 3060
+        ADD = [
+            '17979',
+            '17981',
+            '17983'
+        ]
+    ```
+    - `TIMINGS` - this is a dictionary that maps the cut numbers to the target time in seconds
+    - `ADD_TIME_TARGET` - this is the target time for the segments that need to be added togther (due to floating breaks)
+    - `ADD` - this is a list of the segments whose lengths will be added together to compare with `ADD_TIME_TARGET`
 
 ### Adding New Satellite Promos
 For new promos processed from the satellite receiver, only two things need to be changed
