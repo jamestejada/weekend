@@ -48,7 +48,6 @@ RESET_DIRS = [
     from_cwd('fake_sat_mount')
 ]
 
-
 # Execution Path Flags
 PROCESS_ONLY = check_flags(['process_only', 'process'])
 THREAD = check_flags(['thread', 'threading'])
@@ -56,6 +55,7 @@ FORCE_PROCESS = check_flags(['force'])
 DRY_RUN = check_flags(['mock', 'dry'])
 
 CHECK = check_flags(['check', 'stat', 'status'])
+VERIFY = check_flags(['verify'])
 RESET = check_flags(['reset', 'delete', 'clear'])
 CLEAN = check_flags(['clean'])
 COPY = check_flags(['copy'])

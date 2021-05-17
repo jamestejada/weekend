@@ -1,12 +1,15 @@
+# from modules.verify import check_hashes, check_segments
 from modules.settings import (
     THREAD, PROCESS_ONLY, RESET, RESET_DIRS, CLEAN, DRY_RUN,
-    COPY, CHECK, SAT, SLACK
+    COPY, CHECK, SAT, SLACK, VERIFY
     )
 import shutil
 from modules.coordinate import Pipe_Control, Sat_Control
+from modules.verify import check_segments, check_hashes
 from modules.logger import initialize_logger, start_run, close_logger
 from modules.copy import copy_all
 from modules.check import check_all, slack_check
+
 
 
 def main():
@@ -33,6 +36,11 @@ def main():
 
     if CHECK:
         check_all()
+        return
+    
+    if VERIFY:
+        check_hashes()
+        check_segments()
         return
     
     if SLACK:

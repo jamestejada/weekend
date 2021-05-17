@@ -2,6 +2,9 @@ import json
 from hashlib import md5
 from mutagen.wave import WAVE
 from modules.settings import LOCAL_PATH, FOR_DROPBOX
+from modules import process
+from modules.ftp import connect
+from colorama import Style, Fore
 
 
 class Hash_Verifier:
@@ -206,3 +209,44 @@ class This_American_Life(Segment_Verifier):
         '17040',
         '17042'
     ]
+
+
+segment_verifier_classes = [
+    Reveal,
+    Latino_USA,
+    Says_You,
+    The_Moth,
+    Snap_Judgment,
+    This_American_Life
+]
+
+hash_check_tuples = (
+    #  remote_dir, processor
+    ('LatinoUS', process.Latino_USA),
+    ('RevealWk', process.Reveal),
+    ('SaysYou1', process.Says_You),
+    ('SnapJudg', process.Snap_Judgment),
+    ('THEMOTH', process.The_Moth),
+    ('ThisAmer', process.This_American_Life)
+)
+
+def check_hashes():
+    ftp_server = connect()
+    print()
+    for remote_dir, processor in hash_check_tuples:
+        verifier = Hash_Verifier(ftp_server, remote_dir, processor)
+        bad_hashes = verifier.check_hashes()
+        for segment in bad_hashes:
+            print('CORRUPTED FILE: ', end='', flush=True)
+            print(Fore.RED, Style.BRIGHT, segment, Style.RESET_ALL, end='', flush=True)
+            print(' has been corrupted.')
+
+def check_segments():
+    print()
+    for show in segment_verifier_classes:
+        mistimed_list = show().verify_show()
+        for segment in mistimed_list:
+            print('MIS-TIMED FILE: ', end='', flush=True)
+            print(Fore.RED, Style.BRIGHT, segment.name, Style.RESET_ALL, end='', flush=True)
+            print('is not timed correctly')
+    print()

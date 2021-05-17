@@ -24,7 +24,7 @@ This program automates some of the manual processes related to files for weekend
 1. BONUS TASK A: Get and convert files for show promos that hosts working remotely can use for recorded breaks.
 1. BONUS TASK B: Delete satellite files off of the backup receiver (this is so that we can keep a "hot" backup of our satellite receiver configured in the exact same way as the primary without overloading the harddrive on the receiver)
 
-![The Original Process Flowchart](./images/PRX_Downloads.png)
+![The Original Process Flowchart](./documentation/images/PRX_Downloads.png)
 
 ## [What Does This Program Do?](#capradio-weekend-programming-bot)
 
@@ -38,12 +38,12 @@ All of the above, but *automatically*.
     - Satellite files are downloaded as well
 - Verification of files
     - MD5 checksum ensures files are not corrupted during download.
-    - Segment Length verification
+    - Verifies segment lengths based on broadcast clock (including segments with floating breaks in between)
 - Renaming of files based on air date, destination and show
 - Processing of files
     - Normalization to industry standard (-24 LUFs)
     - mp3 conversion for promos
-- Copying files appropriate destinations (i.e. ENCO Dropbox, or Continuity Folder)
+- Copying files to appropriate destinations (i.e. ENCO Dropbox, or Continuity Folder)
 - Deletion of files from satellite receiver
 - Threading for increased audio processing speed. (Threading allows the execution of multiple audio conversions at the same time)
 - Slack notifications through [webhook workspace integration](./documentation/Slack_Setup.md#slack-workflow-setup).
@@ -61,9 +61,10 @@ All of the above, but *automatically*.
 - [ffmpeg](https://ffmpeg.org/) for audio processing
 - [cifs-utils](https://wiki.samba.org/index.php/LinuxCIFS_utils) (not needed on WSL) - Used for mounting Windows network drives from linux
 - libraries:
-    - python-dotenv
+    - python-dotenv - for environment variables
     - ffmpeg-normalize
-    - requests
+    - requests - for slack notifications
+    - mutagen - for determining length of audio files
 
 ## [Setup](#capradio-weekend-programming-bot)
 
@@ -72,7 +73,7 @@ All of the above, but *automatically*.
     $ git clone https://github.com/jamestejada/weekend.git
     ```
 
-1. Setup a Slack Webhook (if you'd like slack notifications about which files have not been delivered yet). The instructions for setup can be found [here](./documentation/Slack_Setup.md#slack-workflow-setup).
+1. [Setup a Slack Webhook](./documentation/Slack_Setup.md#slack-workflow-setup) (if you'd like slack notifications about which files have not been delivered yet). The instructions for setup can be found [here](./documentation/Slack_Setup.md#slack-workflow-setup).
 
 1. Create a `.env` file in the modules folder with the following environment variable assignments (NOTE: Do not use quotes around the paths)
     - Mount paths
@@ -189,6 +190,8 @@ Here is a list of possible flags for the program:
 
 - Threading [`thread`, `threading`] - using multi-threading to improve performance (for machines that are not using their full processing capacity)
 
+- Verify [`verify`] - verify hashes of downloaded files and audio lengths of processed files and outputs the names of these files to the shell.
+
 
 ## [Setting Up Automatic Execution Using Cron Jobs](#capradio-weekend-programming-bot)
 
@@ -199,7 +202,7 @@ For this implementation I have used the crontab file located at `/etc/crontab` i
 $ sudo nano /etc/crontab
 ```
 
-If you haven't used cron jobs before, the first five columns with combinations of numbers and stars tell the machine when to execute command, the next column (in this case containing `root`) is the user as whom we will execute the command, and the following expressions are the command itself.  
+If you haven't used cron jobs before, the first five columns with combinations of numbers and stars tell the machine when to execute the command, the next column (in this case containing `root`) is the user as whom we will execute the command, and the following expressions are the command itself.  
 
 Here is an example of the lines I have added to this file:
 
