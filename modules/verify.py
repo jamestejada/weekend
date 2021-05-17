@@ -252,13 +252,8 @@ def check_segments():
         print_mistimed_files_for_one_show(verifier) 
         for verifier in segment_verifier_classes
     ]
-
     if not any(list_of_mistimed_file_lists):
         print(Fore.GREEN, 'All file times have been verified', Style.RESET_ALL)
-
-    # for verifier in segment_verifier_classes:
-    #     print(print_mistimed_files_for_one_show(verifier))
-    
     print()
 
 def print_mistimed_files_for_one_show(show_verifier):
