@@ -236,6 +236,11 @@ def check_hashes():
     for remote_dir, processor in hash_check_tuples:
         verifier = Hash_Verifier(ftp_server, remote_dir, processor)
         bad_hashes = verifier.check_hashes()
+
+        if not bad_hashes:
+            print(Fore.GREEN, 'Downloaded files have been verified', Style.RESET_ALL)
+            return
+
         for segment in bad_hashes:
             print('CORRUPTED FILE: ', end='', flush=True)
             print(Fore.RED, Style.BRIGHT, segment, Style.RESET_ALL, end='', flush=True)
@@ -243,10 +248,23 @@ def check_hashes():
 
 def check_segments():
     print()
-    for show in segment_verifier_classes:
-        mistimed_list = show().verify_show()
-        for segment in mistimed_list:
-            print('MIS-TIMED FILE: ', end='', flush=True)
-            print(Fore.RED, Style.BRIGHT, segment.name, Style.RESET_ALL, end='', flush=True)
-            print('is not timed correctly')
+    list_of_mistimed_file_lists = [
+        print_mistimed_files_for_one_show(verifier) 
+        for verifier in segment_verifier_classes
+    ]
+
+    if not any(list_of_mistimed_file_lists):
+        print(Fore.GREEN, 'All file times have been verified', Style.RESET_ALL)
+
+    # for verifier in segment_verifier_classes:
+    #     print(print_mistimed_files_for_one_show(verifier))
+    
     print()
+
+def print_mistimed_files_for_one_show(show_verifier):
+    mistimed_list = show_verifier().verify_show()
+    for segment in mistimed_list:
+        print('MIS-TIMED FILE: ', end='', flush=True)
+        print(Fore.RED, Style.BRIGHT, segment.name, Style.RESET_ALL, end='', flush=True)
+        print('is not timed correctly')
+    return mistimed_list or None
