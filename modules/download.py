@@ -42,7 +42,7 @@ class Download_Files(Hash_Verifier):
             color, message = (
                     Fore.GREEN, 'DOWNLOADED and VERIFIED'
                 ) if success else (
-                    Fore.RED, 'FAILED'
+                    Fore.RED, f'NOT VERIFIED\n{self.hash_local(one_file)}\n{self.hash_remote(one_file)}'
                     )
 
             print(color, message, Style.RESET_ALL)
