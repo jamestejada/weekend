@@ -1,5 +1,5 @@
 from pathlib import Path
-from modules.settings import LOCAL_PATH, DRY_RUN, SAT_PATH
+from modules.settings import LOCAL_PATH, SAT_PATH, Execution_Flags
 from modules.logger import initialize_logger
 from modules.verify import Hash_Verifier
 from colorama import Style, Fore
@@ -17,7 +17,7 @@ class Download_Files(Hash_Verifier):
         self.download_list = download_list
         # self.remote_dir = remote_dir
         # self.ftp_server = ftp_server
-        self.dry_run = DRY_RUN
+        self.dry_run = Execution_Flags.DRY_RUN
 
         for var, value in self.__dict__.items():
             self.logger.debug(f'{var.upper()}: {value}')
@@ -71,7 +71,7 @@ class Sat_Download:
         self.logger = initialize_logger(self.__class__.__name__)
 
         self.download_list = download_list
-        self.dry_run = DRY_RUN
+        self.dry_run = Execution_Flags.DRY_RUN
 
         for var, value in self.__dict__.items():
             self.logger.debug(f'{var}: {value}')

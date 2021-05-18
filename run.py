@@ -1,8 +1,5 @@
 # from modules.verify import check_hashes, check_segments
-from modules.settings import (
-    THREAD, PROCESS_ONLY, RESET, RESET_DIRS, CLEAN, DRY_RUN,
-    COPY, CHECK, SAT, SLACK, VERIFY
-    )
+from modules.settings import Execution_Flags, RESET_DIRS
 import shutil
 from modules.coordinate import Pipe_Control, Sat_Control
 from modules.verify import check_segments, check_hashes
@@ -14,43 +11,43 @@ from modules.check import check_all, slack_check
 
 def main():
 
-    if SAT:
+    if Execution_Flags.SAT:
         Sat_Control(
-            process_only=PROCESS_ONLY,
-            threading=THREAD,
-            dry_run=DRY_RUN
+            process_only=Execution_Flags.PROCESS_ONLY,
+            threading=Execution_Flags.THREAD,
+            dry_run=Execution_Flags.DRY_RUN
         ).execute()
         return
 
-    if RESET:
+    if Execution_Flags.RESET:
         remove_directories()
         return
     
-    if CLEAN:
+    if Execution_Flags.CLEAN:
         clean_directories()
         return
 
-    if COPY:
+    if Execution_Flags.COPY:
         copy_all()
         return
 
-    if CHECK:
+    if Execution_Flags.CHECK:
         check_all()
         return
     
-    if VERIFY:
+    if Execution_Flags.VERIFY:
         check_hashes()
         check_segments()
         return
     
-    if SLACK:
+    if Execution_Flags.SLACK:
         slack_check()
         return
 
     Pipe_Control(
-        process_only=PROCESS_ONLY,
-        threading=THREAD,
-        dry_run=DRY_RUN
+        process_only=Execution_Flags.PROCESS_ONLY,
+        threading=Execution_Flags.THREAD,
+        dry_run=Execution_Flags.DRY_RUN
         ).execute()
 
 

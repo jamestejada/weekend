@@ -3,7 +3,7 @@ from colorama import Fore, Style
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from ffmpeg_normalize import FFmpegNormalize
-from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA, FORCE_PROCESS, DRY_RUN
+from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA, Execution_Flags
 import os
 import subprocess
 
@@ -39,8 +39,8 @@ class Process_BASE:
         self.destination_paths = self.get_destination_paths()
 
         self.threading = threading
-        self.dry_run = DRY_RUN
-        self.force = FORCE_PROCESS
+        self.dry_run = Execution_Flags.DRY_RUN
+        self.force = Execution_Flags.FORCE_PROCESS
 
         self.target_level = target_level
         self.sample_rate = sample_rate

@@ -1,7 +1,7 @@
 import requests
 from modules import process
 from modules.logger import start_run, close_logger, initialize_logger
-from modules.settings import SLACK, SLACK_WEBHOOK
+from modules.settings import SLACK_WEBHOOK, Execution_Flags
 from colorama import Style, Fore
 
 
@@ -78,7 +78,7 @@ def slack_check():
 
     for show_class in CHECK_SHOWS:
         show = show_class()
-        missing_segments = show.check(slack_run=SLACK)
+        missing_segments = show.check(slack_run=Execution_Flags.SLACK)
         if missing_segments:
             request_handler(missing_segments, logger=logger)
 
