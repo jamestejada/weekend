@@ -36,20 +36,21 @@ class Download_Files(Hash_Verifier):
         with open(full_path, 'wb') as out_file:
             print(f'Downloading {one_file}...', end='', flush=True)
             result = self.ftp_server.retrbinary(retr_string, out_file.write)
-            success = ('226' in result) and (
-                self.hash_local(one_file) == self.hash_remote(one_file)
+
+        success = ('226' in result) and (
+            self.hash_local(one_file) == self.hash_remote(one_file)
+            )
+        color, message = (
+                Fore.GREEN, 'DOWNLOADED and VERIFIED'
+            ) if success else (
+                Fore.RED, f'NOT VERIFIED\n{self.hash_local(one_file)}\n{self.hash_remote(one_file)}'
                 )
-            color, message = (
-                    Fore.GREEN, 'DOWNLOADED and VERIFIED'
-                ) if success else (
-                    Fore.RED, f'NOT VERIFIED\n{self.hash_local(one_file)}\n{self.hash_remote(one_file)}'
-                    )
 
-            print(color, message, Style.RESET_ALL)
-            log_func = self.logger.debug if success else self.logger.warning
-            log_func(f'{one_file}: {message}')
+        print(color, message, Style.RESET_ALL)
+        log_func = self.logger.debug if success else self.logger.warning
+        log_func(f'{one_file}: {message}')
 
-            return success
+        return success
 
     # override
     def in_cache(self, file_name):
