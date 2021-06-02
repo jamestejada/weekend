@@ -32,16 +32,10 @@ LOCAL_PATH = from_cwd('files', 'downloads')
 FOR_DROPBOX = from_cwd('files', 'for_dropbox')
 FOR_FFA = from_cwd('files', 'for_ffa')
 
-_sat_mount = Path(os.getenv('SAT_MOUNT'))
-_dropbox_mount = Path(os.getenv('DROPBOX_MOUNT'))
-_ffa_mount = Path(os.getenv('FFA_MOUNT'))
-
-SAT_PATH = _sat_mount if _sat_mount.exists() else from_cwd('fake_sat_mount')
-DROPBOX_PATH = _dropbox_mount if _dropbox_mount.exists() else from_cwd('fake_dropbox_mount')
-FFA_MOUNT = _ffa_mount if _ffa_mount.exists() else from_cwd('fake_ffa_mount')
-
+SAT_PATH = Path(os.getenv('SAT_MOUNT'))
+DROPBOX_PATH = Path(os.getenv('DROPBOX_MOUNT'))
+FFA_MOUNT = Path(os.getenv('FFA_MOUNT'))
 FFA_PATH = FFA_MOUNT.joinpath('- Corona Continuity Breaks -', 'Promos')
-FFA_PATH.mkdir(exist_ok=True, parents=True)
 
 SLACK_WEBHOOK=os.getenv('SLACK_WEBHOOK')
 
