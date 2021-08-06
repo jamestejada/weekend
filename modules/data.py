@@ -1,21 +1,24 @@
 from dataclasses import dataclass, field, asdict
+from typing import List
+
 
 @dataclass
 class Show:
     show_name: str
-    remote_dir: str
     number_of_files: int
-    add_time_target: int
+    remote_dir: str = None
+    add_time_target: int = None
     first_day_offset_offset: int = 1
-    show_match: list = field(default_factory=list)
-    air_days: list = field(default_factory=list)
+    show_match: List[str] = field(default_factory=list)
+    air_days: List[int] = field(default_factory=list)
     segment_match: dict = field(default_factory=dict)
     cut_numbers: dict = field(default_factory=dict)
     timings: dict = field(default_factory=dict)
-    add: list = field(default_factory=list)
+    add: List[str] = field(default_factory=list)
 
     def as_dict(self):
         return asdict(self)
+
 
 REVEAL = Show(
     show_name='Reveal',
@@ -209,5 +212,83 @@ SNAP_JUDGMENT = Show(
     ]
 )
 
+THIS_AMERICAN_LIFE = Show(
+    show_name='This American Life',
+    remote_dir='ThisAmer',
+    number_of_files=5,
+    add_time_target=3480,
+    first_day_offset_offset=2,
+    show_match=['ThisAmer_'],
+    air_days=[5,6],
+    segment_match={
+        'PROM01': 'promo',
+        'PROM02': 'promo_today',
+        'SGMT01': 'segment_a',
+        'SGMT03': 'segment_b',
+        'SGMT02': 'music_bed_a'
+    },
+    cut_numbers={
+        'promo': '25321',
+        'segment_a': '17040',
+        'segment_b': '17042',
+        'music_bed_a': '17041'
+    },
+    timings={
+        '25321': 30,
+        '17041': 60
+    },
+    add=[
+        '17040',
+        '17042'
+    ]
 
-DATA_LIST = [REVEAL, LATINO_USA, SAYS_YOU, SNAP_JUDGMENT, THE_MOTH]
+)
+
+# Satellite
+ITS_BEEN_A_MINUTE = Show(
+    show_name='It\'s Been a Minute',
+    show_match=['ItsBeen1_'],
+    number_of_files=1,
+    air_days=[5],
+    segment_match={'SGMT01': 'promo'},
+    cut_numbers={'promo': '17790'}
+)
+
+ASK_ME_ANOTHER = Show(
+    show_name='Ask Me Another',
+    show_match=['AskMeA1_'],
+    number_of_files=1,
+    air_days=[6],
+    segment_match={'SGMT01': 'promo'},
+    cut_numbers={'promo': '17020'}
+)
+
+HIDDEN_BRAIN = Show(
+    show_name='Hidden Brain',
+    show_match=['HiddenB1_'],
+    number_of_files=1,
+    air_days=[6],
+    segment_match={'SGMT01': 'promo'},
+    cut_numbers={'promo': '18120'}
+)
+
+WAIT_WAIT = Show(
+    show_name='Wait Wait... Don\'t Tell Me!',
+    show_match=['WaitWa2_'],
+    number_of_files=2,
+    air_days=[5, 6],
+    segment_match={'SGMT02': 'promo'},
+    cut_numbers={'promo': '25366'}
+)
+
+WESUN = Show(
+    show_name='Weekend Edition Sunday',
+    show_match=['Weeken20_'],
+    number_of_files=1,
+    air_days=[6],
+    segment_match={'SGMT01': 'promo'},
+    cut_numbers={'promo': '25389'}
+)
+
+DATA_LIST = [REVEAL, LATINO_USA, SAYS_YOU, SNAP_JUDGMENT, THE_MOTH, THIS_AMERICAN_LIFE]
+SATELLITE_DATA_LIST = [ITS_BEEN_A_MINUTE, ASK_ME_ANOTHER, HIDDEN_BRAIN, WAIT_WAIT, WESUN]
