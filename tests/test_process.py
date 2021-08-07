@@ -20,6 +20,7 @@ FAKE_PATHS = [
         ]
 
 AIR_DAYS_NUMBERS = 6
+MAX_SHOW_FILES = 3
 
 @pytest.fixture
 def air_day_string():
@@ -28,8 +29,9 @@ def air_day_string():
 
 
 class Mock_File_Path:
-    def __init__(self, path_string: str) -> None:
-        self.path_string = path_string    
+    def __init__(self, path_string: str, exists:bool=True) -> None:
+        self.path_string = path_string
+        self._exists = exists
 
     @property
     def name(self):
@@ -43,6 +45,9 @@ class Mock_File_Path:
     def suffix(self):
         extension = self.name.split('.')[-1]
         return f'.{extension}'
+    
+    def exists(self):
+        return self._exists
 
     def __str__(self) -> str:
         return str(self.path_string)
@@ -81,7 +86,7 @@ def test_show():
     return Show(
         show_name='Test Show',
         show_match=['test_'],
-        number_of_files=3,
+        number_of_files=MAX_SHOW_FILES,
         remote_dir='test_',
         add_time_target=3060,
         first_day_offset_offset=1,
@@ -100,11 +105,40 @@ def test_show():
 
 
 @pytest.fixture
+def fake_process_list(mock_local_dir, test_show):
+    return [
+        file_path for file_path in mock_local_dir.iterdir()
+        if any(
+            bool(show_match_str in file_path.name) 
+            for show_match_str in test_show.show_match
+            )
+        ]
+
+
+@pytest.fixture
 def processor(test_show, mock_local_dir, mock_dropbox_dir):
     return Process(
         test_show,
         _local_path=mock_local_dir, 
-    _destination_path=mock_dropbox_dir
+        _destination_path=mock_dropbox_dir
+    )
+
+@pytest.fixture
+def force_processor(test_show, mock_local_dir, mock_dropbox_dir):
+    return Process(
+        test_show,
+        _local_path=mock_local_dir, 
+        _destination_path=mock_dropbox_dir,
+        force=True
+    )
+
+@pytest.fixture
+def process_list_processor(test_show, mock_local_dir, mock_dropbox_dir, fake_process_list):
+    return Process(
+        test_show,
+        process_list=fake_process_list,
+        _local_path=mock_local_dir, 
+        _destination_path=mock_dropbox_dir
     )
 
 
@@ -139,14 +173,7 @@ def test_Process_get_file_list_without_process_list(processor, mock_local_dir):
         assert str(fake) == str(actual)
 
 
-def test_Process_get_file_list_with_process_list(processor, mock_local_dir, test_show):
-    fake_process_list = [
-        file_path for file_path in mock_local_dir.iterdir()
-        if any(
-            bool(show_match_str in file_path.name) 
-            for show_match_str in test_show.show_match
-            )
-        ]
+def test_Process_get_file_list_with_process_list(processor, fake_process_list):
     expected = [show_file for show_file in fake_process_list if processor.match_show(show_file.name)]
     actual = processor.get_file_list(process_list=fake_process_list)
     for actual_file, expected_file in zip(actual, expected):
@@ -176,3 +203,19 @@ def test_Process_get_destination_paths(processor, air_day_string):
     assert actual.keys() == expected.keys()
     for key in expected.keys():
         assert str(actual.get(key)) == str(expected.get(key))
+
+
+def test_Process_check_number_of_files(processor):
+    assert processor._check_number_of_files(FAKE_PATHS) == []
+    correct_length_list = [x for x in range(MAX_SHOW_FILES)]
+    assert processor._check_number_of_files(correct_length_list) == correct_length_list
+
+
+def test_Process_should_skip_true(processor):
+    fake_file_path = Mock_File_Path('/fakedir/weekend/files/downloads/variable_test_.wav')
+    assert processor._should_skip(fake_file_path)
+
+def test_Process_should_skip_false(force_processor, process_list_processor):
+    fake_file_path = Mock_File_Path('/fakedir/weekend/files/downloads/variable_test_.wav')
+    assert not force_processor._should_skip(fake_file_path)
+    assert not process_list_processor._should_skip(fake_file_path)
