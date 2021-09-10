@@ -145,7 +145,7 @@ All of the above, but *automatically*.
 
 1. Create Virtual Environment (in project directory)
     ```
-    $ ./environ
+    $ . environ
     ```
 1. Install python dependencies
     ```
