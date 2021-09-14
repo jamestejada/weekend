@@ -1,7 +1,7 @@
 from modules.logger import initialize_logger
 import time
 from datetime import datetime, timedelta
-from modules.settings import LOCAL_PATH
+from modules.settings import PATHS
 
 
 class Chooser:
@@ -92,7 +92,7 @@ class Chooser:
 
         return (first_day < remote_mtime <= last_day)
     
-    def is_newer(self, file_name, modified_date: str, local_file_dir=LOCAL_PATH):
+    def is_newer(self, file_name, modified_date: str, local_file_dir=PATHS.LOCAL_PATH):
         local_path = local_file_dir.joinpath(file_name)
         remote_mtime = self._get_remote_time(modified_date)
 

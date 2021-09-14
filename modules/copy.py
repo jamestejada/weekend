@@ -1,5 +1,5 @@
 from modules.logger import initialize_logger, start_run, close_logger
-from modules.settings import FFA_PATH, DROPBOX_PATH, FOR_FFA, FOR_DROPBOX
+from modules.settings import PATHS
 from modules.choose import Chooser
 from colorama import Fore, Style
 import shutil
@@ -10,7 +10,7 @@ def copy_all():
     logger = initialize_logger('COPY')
     start_run(logger)
 
-    for each_file in FOR_FFA.iterdir():
+    for each_file in PATHS.FOR_FFA.iterdir():
         modified_date = each_file.stat().st_mtime
         modified_date_str = datetime.fromtimestamp(modified_date).strftime('%Y%m%d%H%M%S')
 
@@ -21,7 +21,7 @@ def copy_all():
                 ) and static_chooser.is_newer(
                     each_file.name,
                     modified_date_str,
-                    local_file_dir=FFA_PATH
+                    local_file_dir=PATHS.FFA_PATH
                 )
         
         logger.debug(f'File: {each_file.name} modified {modified_date_str}')
@@ -32,13 +32,13 @@ def copy_all():
             try:
                 shutil.copyfile(
                     str(each_file),
-                    str(FFA_PATH.joinpath(each_file.name))
+                    str(PATHS.FFA_PATH.joinpath(each_file.name))
                 )
             except Exception as e:
                 print(Fore.RED, Style.BRIGHT, 'COPY ERROR: ', e, Style.RESET_ALL)
                 logger.warn(f'COPY FAILED: {e.__class__.__name__} - {e}')
 
-    for each_file in FOR_DROPBOX.iterdir():
+    for each_file in PATHS.FOR_DROPBOX.iterdir():
         modified_date = datetime.fromtimestamp(each_file.stat().st_mtime)
         now = datetime.now()
         max_time = timedelta(minutes=120)
@@ -56,7 +56,7 @@ def copy_all():
             try:
                 shutil.copyfile(
                     str(each_file),
-                    str(DROPBOX_PATH.joinpath(each_file.name))
+                    str(PATHS.DROPBOX_PATH.joinpath(each_file.name))
                 )
             except Exception as e:
                 print(Fore.RED, Style.BRIGHT, 'COPY ERROR: ', e, Style.RESET_ALL)

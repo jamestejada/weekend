@@ -1,5 +1,5 @@
 from pathlib import Path
-from modules.settings import LOCAL_PATH, SAT_PATH, Execution_Flags
+from modules.settings import PATHS, Execution_Flags
 from modules.logger import initialize_logger
 from modules.verify import Hash_Verifier
 from colorama import Style, Fore
@@ -8,7 +8,7 @@ import shutil
 
 class Download_Files(Hash_Verifier):
 
-    LOCAL_PATH = LOCAL_PATH
+    LOCAL_PATH = PATHS.LOCAL_PATH
 
     def __init__(self, ftp_server, remote_dir: str, download_list: list):
         self.logger = initialize_logger(self.__class__.__name__)
@@ -58,14 +58,12 @@ class Download_Files(Hash_Verifier):
         # Download_Files class because we want all newly downloaded files
         # To store a new hash in the hash cache when self.hash_remote is called.
         return False
-    
-
 
 
 class Sat_Download:
 
-    LOCAL_PATH = LOCAL_PATH
-    SAT_PATH = SAT_PATH
+    LOCAL_PATH = PATHS.LOCAL_PATH
+    SAT_PATH = PATHS.SAT_PATH
 
     def __init__(self, download_list: list):
 

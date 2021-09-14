@@ -22,6 +22,7 @@ class Audio:
         """Normalizes audio file to self.target_level and outputs
         to destination from source
         """
+        Message.writing(destination)
         norm = FFmpegNormalize(
             target_level=self.target_level,
             sample_rate=self.sample_rate,
@@ -30,16 +31,38 @@ class Audio:
         )
         norm.add_media_file(source, destination)
         norm.run_normalization()
+        Message.done()
 
     # usually used to convert to .mp3 files that are going to FFA
     def convert_to_mp3(self, source, destination):
         """converts file to .mp3 and outputs to destination from source"""
+        Message.writing(destination)
         subprocess.run(
             [
                 'ffmpeg', '-i', str(source), '-vn', '-ar', str(self.sample_rate),
                 '-ac', '2', '-b:a', self.bitrate, '-y', str(destination)
             ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL #  Supresses output
         )
+        Message.done()
+
+
+class Message:
+    @staticmethod
+    def writing(destination) -> None:
+        print(
+            f'Writing "{destination.name}" to "{destination.parent.stem}"...',
+            end='',
+            flush=True
+            )
+
+    @staticmethod
+    def done():
+        print(Fore.GREEN, 'DONE', Style.RESET_ALL)
+    
+    @staticmethod
+    def error(error):
+        print(Fore.RED, Style.BRIGHT, 'ERROR: ', error, Style.RESET_ALL)
+
 
 class Process(Audio):
     LOCAL_PATH = PATHS.LOCAL_PATH
@@ -47,7 +70,7 @@ class Process(Audio):
     FOR_FFA = PATHS.FOR_FFA
 
     def __init__(
-        self, show_data:Show, process_list:list=None, threading:bool=False, force=False,
+        self, show_data:Show, process_list:list=None, threading:bool=False, force:bool=False,
         _local_path=None, _destination_path=None, _ffa_path=None, **audio_kwargs
         ) -> None:
 
@@ -88,7 +111,7 @@ class Process(Audio):
     def process_for_ffa(self, key='promo'):
         source = self.destination_paths.get(key)
         destination = self._get_ffa_destination()
-        if source and source.exists():
+        if source and source.exists() and not self._should_skip(destination):
             self.convert_to_mp3(source, destination)
     
     def _get_ffa_destination(self, key='promo', extension='.mp3'):
@@ -110,10 +133,11 @@ class Process(Audio):
         with ThreadPoolExecutor() as executor:
             executor.map(self.normalize, self._source_destination_list)
 
-
     def _should_skip(self, destination):
+        if not destination:
+            return False
         return all([
-            destination, destination.exists(),
+            destination.exists(),
             not self.force, not self.process_list
             ])
 
@@ -134,7 +158,7 @@ class Process(Audio):
                 f'Too many files for show, {self.show_string}'
             )
         except AssertionError as e:
-            print(Fore.RED, Style.BRIGHT, 'ERROR: ', e, Style.RESET_ALL)
+            Message.error(e)
             return []
         return path_list
 
@@ -142,9 +166,9 @@ class Process(Audio):
         if not process_list:
             return []
         return [
-            self.local_path.joinpath(file_path.name)
-            for file_path in process_list
-            if self.match_show(file_path.name)
+            self.local_path.joinpath(file_name)
+            for file_name in process_list
+            if self.match_show(file_name)
         ]
 
     def _local_dir_files(self) -> list:

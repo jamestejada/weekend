@@ -6,10 +6,14 @@ from modules.verify import check_segments, check_hashes
 from modules.logger import initialize_logger, start_run, close_logger
 from modules.copy import copy_all
 from modules.check import check_all, slack_check
-
+import pytest
 
 
 def main():
+
+    if Execution_Flags.TESTS:
+        pytest.main(['-vv'])
+        return
 
     if Execution_Flags.SAT:
         Sat_Control(
@@ -58,7 +62,7 @@ def remove_directories():
 
     for directory in RESET_DIRS:
         shutil.rmtree(str(directory), ignore_errors=True)
-    
+        print('deleting', directory)
     close_logger(logger)
 
 

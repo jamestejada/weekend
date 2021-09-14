@@ -3,7 +3,7 @@ from colorama import Fore, Style
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from ffmpeg_normalize import FFmpegNormalize
-from modules.settings import LOCAL_PATH, FOR_DROPBOX, FOR_FFA, Execution_Flags
+from modules.settings import PATHS, Execution_Flags
 import os
 import subprocess
 
@@ -19,9 +19,9 @@ class Process_BASE:
     SEGMENT_MATCHES = None
     CUT_NUMBERS = None
 
-    LOCAL_PATH = LOCAL_PATH
-    FOR_DROPBOX = FOR_DROPBOX
-    FOR_FFA = FOR_FFA
+    LOCAL_PATH = PATHS.LOCAL_PATH
+    FOR_DROPBOX = PATHS.FOR_DROPBOX
+    FOR_FFA = PATHS.FOR_FFA
 
     def __init__(
         self, process_list=None, sample_rate=44100, target_level=-24.0,

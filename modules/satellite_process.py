@@ -1,4 +1,4 @@
-from modules.process import Process_BASE
+from modules.old_process import Process_BASE
 
 
 """ This module gets promos from satellite to process and

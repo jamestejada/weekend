@@ -52,6 +52,7 @@ class Execution_Flags:
     THREAD = check_flags('thread', 'threading')
     FORCE_PROCESS = check_flags('force')
     DRY_RUN = check_flags('mock', 'dry')
+    TESTS = check_flags('test', 'tests')
 
     CHECK = check_flags('check', 'stat', 'status')
     VERIFY = check_flags('verify')

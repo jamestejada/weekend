@@ -107,7 +107,7 @@ def test_show():
 @pytest.fixture
 def fake_process_list(mock_local_dir, test_show):
     return [
-        file_path for file_path in mock_local_dir.iterdir()
+        file_path.name for file_path in mock_local_dir.iterdir()
         if any(
             bool(show_match_str in file_path.name) 
             for show_match_str in test_show.show_match
@@ -173,8 +173,8 @@ def test_Process_get_file_list_without_process_list(processor, mock_local_dir):
         assert str(fake) == str(actual)
 
 
-def test_Process_get_file_list_with_process_list(processor, fake_process_list):
-    expected = [show_file for show_file in fake_process_list if processor.match_show(show_file.name)]
+def test_Process_get_file_list_with_process_list(processor, fake_process_list, mock_local_dir):
+    expected = [mock_local_dir.joinpath(show_file) for show_file in fake_process_list if processor.match_show(show_file)]
     actual = processor.get_file_list(process_list=fake_process_list)
     for actual_file, expected_file in zip(actual, expected):
         assert str(actual_file) == str(expected_file)
