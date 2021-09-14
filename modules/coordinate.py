@@ -191,10 +191,10 @@ class Pipe_Control:
 
     def process_files(self):
         self._print_processing_message()
-        for _, pipe_info_dict in self.EXECUTIONS.items():
-            self.print_show(pipe_info_dict.get('show_data').show_name)
-            self._process_one_show(pipe_info_dict.get('show_data'))
-            self._verify_processed_files(pipe_info_dict)
+        for show_data in self.show_data_list:
+            self.print_show(show_data.show_name)
+            self._process_one_show(show_data=show_data)
+            self._verify_processed_files(show_data=show_data)
 
     def _print_processing_message(self):
         print()
@@ -203,18 +203,24 @@ class Pipe_Control:
     def _process_one_show(self, show_data, any_file_mistimed=False):
         """Instantiates a processor class and runs the process() method"""
         process_list = None if any_file_mistimed else self.file_process_list
-        processor = Process(show_data=show_data, process_list=process_list).process()
+        print(process_list)
+        Process(
+            show_data=show_data,
+            process_list=process_list,
+            threading=self.threading,
+            force=self.process_only
+            ).process()
 
-    def _verify_processed_files(self, pipe_info: dict) -> None:
+    def _verify_processed_files(self, show_data:object) -> None:
         """Verifies processed file lengths. If any processed files are not the correct
         length, the files are deleted and reprocessed. 
         """
         # length_verifier_class = pipe_info.get('verifier')
-        mistimed_files = verify.Segment_Verifier(pipe_info.get('show_data')).verify_show()
+        mistimed_files = verify.Segment_Verifier(show_data).verify_show()
         if mistimed_files:
             self._delete_bad_files(mistimed_files)
             self.logger.warn('Retrying processing')
-            self._process_one_show(pipe_info.get('show_data'), any_file_mistimed=True)
+            self._process_one_show(show_data, any_file_mistimed=True)
 
     def _delete_bad_files(self, bad_files: list) -> None:
         for bad_file in bad_files:

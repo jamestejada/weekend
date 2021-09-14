@@ -22,7 +22,8 @@ class Audio:
         """Normalizes audio file to self.target_level and outputs
         to destination from source
         """
-        Message.writing(destination)
+        if not self.threading:
+            Message.writing(destination)
         norm = FFmpegNormalize(
             target_level=self.target_level,
             sample_rate=self.sample_rate,
@@ -31,6 +32,8 @@ class Audio:
         )
         norm.add_media_file(source, destination)
         norm.run_normalization()
+        if self.threading:
+            Message.writing(destination)
         Message.done()
 
     # usually used to convert to .mp3 files that are going to FFA
@@ -127,14 +130,21 @@ class Process(Audio):
             (self.source_paths.get(segment), self.destination_paths.get(segment))
             for segment in self.cut_numbers.keys()
             if not self._should_skip(self.destination_paths.get(segment))
+            and self.source_paths.get(segment) is not None
+            and self.destination_paths.get(segment) is not None
         ]
 
     def _thread_normalize(self):
         with ThreadPoolExecutor() as executor:
-            executor.map(self.normalize, self._source_destination_list)
+            print(self._source_destination_list)
+            executor.map(
+                self.normalize,
+                [file_path[0] for file_path in self._source_destination_list],
+                [file_path[1] for file_path in self._source_destination_list]
+                )
 
     def _should_skip(self, destination):
-        if not destination:
+        if not destination :
             return False
         return all([
             destination.exists(),
