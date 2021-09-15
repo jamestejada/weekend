@@ -180,6 +180,7 @@ SNAP_JUDGMENT = Show(
     show_match=[str(num) for num in range(14155, 14162)],
     number_of_files=7,
     air_days=[6],
+    first_day_offset_offset=3,
     segment_match={
         '14161': 'promo',
         '14155': 'billboard',
@@ -241,7 +242,30 @@ THIS_AMERICAN_LIFE = Show(
         '17040',
         '17042'
     ]
+)
 
+THE_CHAMB = Show(
+    show_name='Chamber Music Society',
+    remote_dir='TheChamb',
+    number_of_files=4,
+    add_time_target=3465,
+    first_day_offset_offset=0,
+    show_match=['TheChamb_'],
+    air_days=[6],
+    segment_match={
+        'PROM01': 'promo',
+        'SGMT01': 'billboard',
+        'SGMT02': 'segment_a',
+        'SGMT03': 'segment_b'
+    },
+    cut_numbers={
+        'promo': '16138',
+        'billboard': '16135',
+        'segment_a': '16136',
+        'segment_b': '16137'
+    },
+    timings={'16138': 30,'16135': 45},
+    add=['16136', '16137']
 )
 
 # Satellite
@@ -290,10 +314,20 @@ WESUN = Show(
     cut_numbers={'promo': '25389'}
 )
 
+THROUGHLINE = Show(
+    show_name='Throughline',
+    show_match=['Through1_'],
+    number_of_files=2,
+    air_days=[6],
+    segment_match={'SGMT01': 'promo'},
+    cut_numbers={'promo': '25318'}
+)
+
 PRX_DATA_LIST = [
         REVEAL, 
         LATINO_USA, 
-        SAYS_YOU, 
+        # SAYS_YOU, 
+        THE_CHAMB,
         SNAP_JUDGMENT, 
         THE_MOTH, 
         THIS_AMERICAN_LIFE
@@ -303,5 +337,6 @@ SATELLITE_DATA_LIST = [
         ASK_ME_ANOTHER,
         HIDDEN_BRAIN,
         WAIT_WAIT,
-        WESUN
+        WESUN,
+        THROUGHLINE
     ]

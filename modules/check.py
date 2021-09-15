@@ -1,20 +1,22 @@
 import requests
-from modules import old_process
+# from modules import old_process
+from modules import process
+from modules.data import PRX_DATA_LIST
 from modules.logger import start_run, close_logger, initialize_logger
 from modules.settings import SLACK_WEBHOOK, Execution_Flags
 from colorama import Style, Fore
 
 
-class Check_BASE(old_process.Process_BASE):
+class Check(process.Process):
     def check(self, slack_run=False):
         exist_dict = self._which_exist()
         if slack_run:
             return self.send_to_slack(exist_dict)
-        print(Fore.CYAN, f'\n-{self}-', Style.RESET_ALL)
+        print(Fore.CYAN, f'\n-{self.show_string}-', Style.RESET_ALL)
         self.check_print(exist_dict)
     
     def send_to_slack(self, exist_dict):
-        show_class_name = self.__class__.__name__
+        show_class_name = self.show_string
         missing_segments = {
             show_class_name: [
                 segment.replace('_', ' ').title() 
@@ -37,38 +39,14 @@ class Check_BASE(old_process.Process_BASE):
         """
         return {
             segment_name: (segment_name in self.source_paths.keys())
-            for segment_name in self.CUT_NUMBERS.keys()
+            for segment_name in self.cut_numbers.keys()
         }
-    
-    def __str__(self):
-        return self.__class__.__name__.replace('_', ' ')
 
-# NOTE: Check_BASE inherits from Process_BASE, and then the 
-#       show checking classes below inherit from the show processing
-#       classes, which inherit from Process_BASE also. 
-# TO DO: test if you don't need to inherit from process.Process_BASE.
-class Reveal(Check_BASE, old_process.Reveal): ...
-class Latino_USA(Check_BASE, old_process.Latino_USA): ...
-class Says_You(Check_BASE, old_process.Says_You): ...
-class The_Moth(Check_BASE, old_process.The_Moth): ...
-class Snap_Judgment(Check_BASE, old_process.Snap_Judgment): ...
-class This_American_Life(Check_BASE, old_process.This_American_Life): ...
-
-
-CHECK_SHOWS = [
-    Reveal, 
-    Latino_USA,
-    Says_You,
-    The_Moth,
-    Snap_Judgment,
-    This_American_Life
-]
 
 # used in run.py
 def check_all():
-    for show_class in CHECK_SHOWS:
-        show = show_class()
-        show.check()
+    for show_data in PRX_DATA_LIST:
+        Check(show_data).check()
     print()
 
 # used in run.py
@@ -76,9 +54,9 @@ def slack_check():
     logger = initialize_logger('CHECK')
     start_run(logger)
 
-    for show_class in CHECK_SHOWS:
-        show = show_class()
-        missing_segments = show.check(slack_run=Execution_Flags.SLACK)
+
+    for show_data in PRX_DATA_LIST:
+        missing_segments = Check(show_data).check(slack_run=Execution_Flags.SLACK)
         if missing_segments:
             request_handler(missing_segments, logger=logger)
 
@@ -97,10 +75,10 @@ def request_handler(missing_segment_dict: dict, logger=None):
     show_name = list(missing_segment_dict.keys())[0]
     missing_list = missing_segment_dict.get(show_name)
 
-    logger.info(f'{show_name.replace("_", " ")} missing files: {missing_list}')
+    logger.info(f'{show_name} missing files: {missing_list}')
 
     payload = {
-        'show_name': show_name.replace('_', ' '),
+        'show_name': show_name,
         'missing_file_list': ', '.join(missing_list)
     }
     requests.post(SLACK_WEBHOOK, json=payload)

@@ -252,4 +252,6 @@ class Process(Audio):
             + f'{segment_string} {self.air_days_string}{extension}'
             )
     
+    def __str__(self):
+        return self.show_string
 

@@ -1,11 +1,12 @@
-from modules.old_process import Process_BASE
+# from modules.old_process import Process_BASE
+from modules.process import Process
 
 
 """ This module gets promos from satellite to process and
 transfer to FFA for continuity producers.
 """
 
-class Process_Satellite_BASE(Process_BASE):
+class Process_Satellite(Process):
     # Develop something to catch generic promos in segment matches later
 
     # override
@@ -28,41 +29,41 @@ class Process_Satellite_BASE(Process_BASE):
         return False
 
 
-class Its_Been_A_Minute(Process_Satellite_BASE):
-    SHOW_MATCH = ['ItsBeen1_']
-    NUMBER_OF_SHOW_FILES = 1
-    AIR_DAYS = [5]
-    SEGMENT_MATCHES = {'SGMT01': 'promo'}
-    CUT_NUMBERS = {'promo': '17790'}
+# class Its_Been_A_Minute(Process_Satellite_BASE):
+#     SHOW_MATCH = ['ItsBeen1_']
+#     NUMBER_OF_SHOW_FILES = 1
+#     AIR_DAYS = [5]
+#     SEGMENT_MATCHES = {'SGMT01': 'promo'}
+#     CUT_NUMBERS = {'promo': '17790'}
 
 
-class Ask_Me_Another(Process_Satellite_BASE):
-    SHOW_MATCH = ['AskMeA1_']
-    NUMBER_OF_SHOW_FILES = 1
-    AIR_DAYS = [6]
-    SEGMENT_MATCHES = {'SGMT01': 'promo'}
-    CUT_NUMBERS = {'promo': '17020'}
+# class Ask_Me_Another(Process_Satellite_BASE):
+#     SHOW_MATCH = ['AskMeA1_']
+#     NUMBER_OF_SHOW_FILES = 1
+#     AIR_DAYS = [6]
+#     SEGMENT_MATCHES = {'SGMT01': 'promo'}
+#     CUT_NUMBERS = {'promo': '17020'}
 
 
-class Hidden_Brain(Process_Satellite_BASE):
-    SHOW_MATCH = ['HiddenB1_']
-    NUMBER_OF_SHOW_FILES = 1
-    AIR_DAYS = [6]
-    SEGMENT_MATCHES = {'SGMT01': 'promo'}
-    CUT_NUMBERS = {'promo': '18120'}
+# class Hidden_Brain(Process_Satellite_BASE):
+#     SHOW_MATCH = ['HiddenB1_']
+#     NUMBER_OF_SHOW_FILES = 1
+#     AIR_DAYS = [6]
+#     SEGMENT_MATCHES = {'SGMT01': 'promo'}
+#     CUT_NUMBERS = {'promo': '18120'}
 
 
-class Wait_Wait(Process_Satellite_BASE):
-    SHOW_MATCH = ['WaitWa2_']
-    NUMBER_OF_SHOW_FILES = 2
-    AIR_DAYS = [5, 6]
-    SEGMENT_MATCHES = {'SGMT02': 'promo'}
-    CUT_NUMBERS = {'promo': '25366'}
+# class Wait_Wait(Process_Satellite_BASE):
+#     SHOW_MATCH = ['WaitWa2_']
+#     NUMBER_OF_SHOW_FILES = 2
+#     AIR_DAYS = [5, 6]
+#     SEGMENT_MATCHES = {'SGMT02': 'promo'}
+#     CUT_NUMBERS = {'promo': '25366'}
 
 
-class WeSun(Process_Satellite_BASE):
-    SHOW_MATCH = ['Weeken20_']
-    NUMBER_OF_SHOW_FILES = 1
-    AIR_DAYS = [6]
-    SEGMENT_MATCHES = {'SGMT01': 'promo'}
-    CUT_NUMBERS = {'promo': '25389'}
+# class WeSun(Process_Satellite_BASE):
+#     SHOW_MATCH = ['Weeken20_']
+#     NUMBER_OF_SHOW_FILES = 1
+#     AIR_DAYS = [6]
+#     SEGMENT_MATCHES = {'SGMT01': 'promo'}
+#     CUT_NUMBERS = {'promo': '25389'}

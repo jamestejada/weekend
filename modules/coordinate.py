@@ -1,89 +1,19 @@
 from modules.settings import PATHS
-from modules import choose, old_process, satellite_process, verify, process
+from modules import choose, satellite_process, verify, process
 from modules.ftp import connect
 from colorama import Fore, Style
 from modules.download import Download_Files, Sat_Download
 from modules.logger import initialize_logger, start_run, close_logger
 
-from modules.process import Process
-from modules.data import LATINO_USA, REVEAL, SAYS_YOU, SNAP_JUDGMENT, THE_MOTH, THIS_AMERICAN_LIFE
 from modules.data import PRX_DATA_LIST, SATELLITE_DATA_LIST
 
-
-EXECUTIONS = {
-    'LatinoUS': {
-        'show_name': 'Latino USA',
-        'chooser': choose.Chooser_Latino_USA,
-        'processor': old_process.Latino_USA,
-        'verifier': verify.Segment_Verifier,
-        'show_data': LATINO_USA
-    },
-    'RevealWk': {
-        'show_name': 'Reveal',
-        'chooser': choose.Chooser_Reveal,
-        'processor': old_process.Reveal,
-        'verifier': verify.Segment_Verifier,
-        'show_data': REVEAL
-    },
-    'SaysYou1': {
-        'show_name': 'Says You',
-        'chooser': choose.Chooser,
-        'processor': old_process.Says_You,
-        'verifier': verify.Segment_Verifier,
-        'show_data': SAYS_YOU
-    },
-    'SnapJudg': {
-        'show_name': 'Snap Judgment',
-        'chooser': choose.Chooser_Snap_Judgment,
-        'processor': old_process.Snap_Judgment,
-        'verifier': verify.Segment_Verifier,
-        'show_data': SNAP_JUDGMENT
-    },
-    'THEMOTH': {
-        'show_name': 'The Moth',
-        'chooser': choose.Chooser,
-        'processor': old_process.The_Moth,
-        'verifier': verify.Segment_Verifier,
-        'show_data': THE_MOTH
-    },
-    'ThisAmer': {
-        'show_name': 'This American Life',
-        'chooser': choose.Chooser_TAL,
-        'processor': old_process.This_American_Life,
-        'verifier': verify.Segment_Verifier,
-        'show_data': THIS_AMERICAN_LIFE
-    }
-}
-
-SAT_EXEC = {
-    'Its_Been_A_Minute':{
-        'show_name': 'Its Been a Minute',
-        'processor': satellite_process.Its_Been_A_Minute
-    },
-    'Ask_Me_Another': {
-        'show_name': 'Ask Me Another',
-        'processor': satellite_process.Ask_Me_Another
-    },
-    'Hidden_Brain': {
-        'show_name': 'Hidden Brain',
-        'processor': satellite_process.Hidden_Brain
-    },
-    'Wait_Wait': {
-        'show_name': 'Wait Wait... Don\'t Tell Me!',
-        'processor': satellite_process.Wait_Wait
-    },
-    'WeSun': {
-        'show_name': 'Weekend Edition Sunday',
-        'processor': satellite_process.WeSun
-    }
-}
 
 
 class Pipe_Control:
     """This class coordinates choosing, downloading and processing
     of various show files."""
-    EXECUTIONS = EXECUTIONS
-    GET_OLDER_FILES = ['RevealWk', 'THEMOTH']
+    # EXECUTIONS = EXECUTIONS
+    GET_OLDER_FILES = ['RevealWk', 'THEMOTH', 'TheChamb']
     SHOW_LIST = PRX_DATA_LIST
 
     def __init__(self, process_only: bool = False, 
@@ -100,6 +30,7 @@ class Pipe_Control:
 
         self.hash_verifier = verify.Hash_Verifier
         self.segment_verifer = verify.Segment_Verifier
+        self.processor = process.Process
 
         self.logger.info(f'PROCESS ONLY: {self.process_only}')
         self.logger.info(f'THREADING: {self.threading}')
@@ -173,15 +104,17 @@ class Pipe_Control:
     def _choose_files(self, show_data, file_info_generator):
 
         which_file_set = 'old' if show_data.remote_dir in self.GET_OLDER_FILES else 'latest'
-        chooser_class = self.EXECUTIONS.get(show_data.remote_dir).get('chooser')
-        path_list = Process(show_data).file_list
+        # chooser_class = self.EXECUTIONS.get(show_data.remote_dir).get('chooser')
+        chooser_class = choose.Chooser
+        path_list = self.processor(show_data).file_list
         local_list = [file_path.name for file_path in path_list]
 
         chooser = chooser_class(
                 file_info_generator=file_info_generator,
                 which_file_set=which_file_set,
                 local_list=local_list,
-                dry_run=self.dry_run
+                dry_run=self.dry_run,
+                first_day_offset_offset=show_data.first_day_offset_offset
             )
         file_get_list = chooser.files_to_get()
 
@@ -203,8 +136,7 @@ class Pipe_Control:
     def _process_one_show(self, show_data, any_file_mistimed=False):
         """Instantiates a processor class and runs the process() method"""
         process_list = None if any_file_mistimed else self.file_process_list
-        print(process_list)
-        Process(
+        self.processor(
             show_data=show_data,
             process_list=process_list,
             threading=self.threading,
@@ -229,7 +161,7 @@ class Pipe_Control:
 
 
 class Sat_Control:
-    SAT_EXEC = SAT_EXEC
+    SHOW_LIST = SATELLITE_DATA_LIST
 
     def __init__(self, process_only: bool = False, 
             threading: bool = False, dry_run: bool = False):
@@ -240,6 +172,8 @@ class Sat_Control:
         self.process_only = process_only
         self.threading = threading
         self.dry_run = dry_run
+
+        self.processor = satellite_process.Process_Satellite
 
         for var, value in self.__dict__.items():
             self.logger.debug(f'{var}: {value}')
@@ -257,22 +191,21 @@ class Sat_Control:
             Style.RESET_ALL
             )
         all_results = []
-        for _, pipe_info in self.SAT_EXEC.items():
-            download_list = self._choose_files(pipe_info)
-
-            self.logger.info(f'{pipe_info.get("show_name")} Download List: {download_list}')
+        for show_data in self.SHOW_LIST:
+            download_list = self._choose_files(show_data)
+            self.logger.info(f'{show_data.show_name} Download List: {download_list}')
 
             if download_list:
-                self.print_show(pipe_info.get('show_name'))
-
+                self.print_show(show_data.show_name)
+            
             download_files = Sat_Download(download_list=download_list)
-            one_show_results = download_files.download_all()
+            one_show_result = download_files.download_all()
 
             self.logger.debug(
-                f'Download results for {pipe_info.get("show_name")}: {one_show_results}'
-                )
-
-            all_results.append(one_show_results)
+                f'Download results for {show_data.show_name}: {one_show_result}'
+            )
+            
+            all_results.append(one_show_result)
         
         if self._all_success(all_results):
             self.logger.info(f'All Downloads Suceed? {self._all_success(all_results)}')
@@ -286,31 +219,22 @@ class Sat_Control:
             [all(result) for result in results]
         )
 
-    def _choose_files(self, pipe_info: dict):
-        processor = self._get_processor_instance(pipe_info)
+    def _choose_files(self, show_data:object):
+        processor = self.processor(show_data)
         return [
             file_path.name for file_path in PATHS.SAT_PATH.iterdir()
             if processor.match_show(file_path.stem)
         ]
 
     def process(self):
+        print(Fore.YELLOW, '\nPROCESSING...', Style.RESET_ALL)
+        for show_data in self.SHOW_LIST:
+            self.print_show(show_data.show_name)
+            self.processor(show_data).process()
         print()
-        print(Fore.YELLOW, 'PROCESSING...', Style.RESET_ALL)
-
-        for _, pipe_info in self.SAT_EXEC.items():
-            show_name = pipe_info.get('show_name')
-            self.print_show(show_name)
-            processor = self._get_processor_instance(pipe_info)
-            processor.process()
-        print()
-    
-    def _get_processor_instance(self, pipe_info: dict):
-        processor_class = pipe_info.get('processor')
-        return processor_class()
     
     def print_show(self, show_name):
-        print()
-        print(Fore.CYAN, f'-{show_name}-', Style.RESET_ALL)
+        print(Fore.CYAN, f'\n-{show_name}-', Style.RESET_ALL)
     
     def clear_satellite(self):
         print(Fore.RED, 'Deleting all files from Sat Receiver...', Style.RESET_ALL)

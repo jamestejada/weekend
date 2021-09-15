@@ -9,7 +9,7 @@ class Chooser:
     """
     def __init__(self, 
         file_info_generator=None, which_file_set='latest', 
-        local_list=None, dry_run=False):
+        local_list=None, dry_run=False, first_day_offset_offset=1):
         
         self.logger = initialize_logger(self.__class__.__name__)
 
@@ -24,7 +24,8 @@ class Chooser:
         self.mtime_offset = timedelta(hours=(7 if daylight_savings else 8))
         self.today = datetime.today()
         self.weekday = self.today.weekday()
-        
+        self.first_day_offset_offset = first_day_offset_offset
+
         self.files_in_date_range = self.get_files_in_date_range(self.all_files)
         self.episode = self.get_episode(self.files_in_date_range)
 
@@ -127,7 +128,7 @@ class Chooser:
         """ Returns the days to be subtracted from today to reach the
         earliest date modified that will be accepted for download. 
         """
-        return timedelta(days=self.weekday + 1)
+        return timedelta(days=self.weekday + self.first_day_offset_offset)
 
     @property
     def last_day_offset(self):
@@ -137,30 +138,30 @@ class Chooser:
         return timedelta(days=5 - self.weekday)
 
 
-class Chooser_Snap_Judgment(Chooser):
-    # override
-    @property
-    def first_day_offset(self):
-        return timedelta(days=self.weekday + 3)
+# class Chooser_Snap_Judgment(Chooser):
+#     # override
+#     @property
+#     def first_day_offset(self):
+#         return timedelta(days=self.weekday + 3)
 
 
-class Chooser_TAL(Chooser):
-    # override
-    @property
-    def first_day_offset(self):
-        # This gets Promos uploaded Saturday Evening.
-        return timedelta(days=self.weekday + 2)
+# class Chooser_TAL(Chooser):
+#     # override
+#     @property
+#     def first_day_offset(self):
+#         # This gets Promos uploaded Saturday Evening.
+#         return timedelta(days=self.weekday + 2)
 
 
-class Chooser_Latino_USA(Chooser):
-    # override
-    @property
-    def first_day_offset(self):
-        return timedelta(days=self.weekday + 3)
+# class Chooser_Latino_USA(Chooser):
+#     # override
+#     @property
+#     def first_day_offset(self):
+#         return timedelta(days=self.weekday + 3)
 
 
-class Chooser_Reveal(Chooser):
-    # override
-    @property
-    def first_day_offset(self):
-        return timedelta(days=self.weekday + 2)
+# class Chooser_Reveal(Chooser):
+#     # override
+#     @property
+#     def first_day_offset(self):
+#         return timedelta(days=self.weekday + 2)
