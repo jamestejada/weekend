@@ -104,6 +104,8 @@ LATINO_USA = Show(
 )
 
 SAYS_YOU = Show(
+    # No Longer on the air
+    # RIP Richard Sher
     show_name='Says You',
     number_of_files=6,
     remote_dir='SaysYou1',
@@ -326,12 +328,12 @@ THROUGHLINE = Show(
 PRX_DATA_LIST = [
         REVEAL, 
         LATINO_USA, 
-        # SAYS_YOU, 
         THE_CHAMB,
         SNAP_JUDGMENT, 
         THE_MOTH, 
         THIS_AMERICAN_LIFE
     ]
+
 SATELLITE_DATA_LIST = [
         ITS_BEEN_A_MINUTE,
         ASK_ME_ANOTHER,

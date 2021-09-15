@@ -247,180 +247,83 @@ To execute this program, we will first need to navigate to the project folder `c
 ## [Adding New Shows For Processing](#capradio-weekend-programming-bot)
 
 ### Adding New PRX Shows
-To add a new show for download/processing, a few things must be changed. 
-1. Processing Class
-    - The processing base class has been designed so that adding a new show will only involve inheriting from `Process_BASE` and setting class variables.
-    - Example:
-        ```python
-        class Reveal(Process_BASE):
-            NUMBER_OF_SHOW_FILES = 9
-            SHOW_MATCH = ['RevealWk_']
-            AIR_DAYS = [4]
-            SEGMENT_MATCHES = {
-                'PROM01': 'promo',
-                'SGMT01': 'billboard',
-                'SGMT03': 'segment_a',
-                'SGMT05': 'segment_b',
-                'SGMT07': 'segment_c',
-                'SGMT04': 'music_bed_a',
-                'SGMT06': 'music_bed_b',
-                'SGMT02': 'music_bed_C'
-            }
-            CUT_NUMBERS = {
-                'promo': '17984',
-                'billboard': '17978',
-                'segment_a': '17979',
-                'segment_b': '17981',
-                'segment_c': '17983',
-                'music_bed_a': '17980',
-                'music_bed_b': '17982'
-                # 'music_bed_c': 'NOT USED'
-            }
+To add a new show for download/processing, create an instance of the `Show` class in `./modules/data.py` and add it to the `PRX_DATA_LIST` list.
 
-        class Latino_USA(Process_BASE):
-            SHOW_MATCH = [str(num) for num in range(35232, 35249)]
-            NUMBER_OF_SHOW_FILES = 9
-            AIR_DAYS = [6]
-            SEGMENT_MATCHES = {
-                '35232': 'promo',
-                '35242': 'billboard',
-                '35244': 'segment_a',
-                '35246': 'segment_b',
-                '35248': 'segment_c',
-                '35243': 'music_bed_a',
-                '35245': 'music_bed_b',
-                '35247': 'music_bed_c'
-            }
-            CUT_NUMBERS = {
-                'promo': '75292',
-                'billboard': '17030',
-                'segment_a': '17032',
-                'segment_b': '17034',
-                'segment_c': '17036',
-                'music_bed_a': '17031',
-                'music_bed_b': '17033',
-                'music_bed_c': '17035'
-            }
-
-        ```
-        - SHOW_MATCH - This is a list of strings that will be matched to determine if a file is for the specific show that this class is processing
-        - NUMBER_OF_SHOW_FILES - This is used for error checking. If there are too many files, an exception will be thrown so that wrong files will be stopped from entering the system. 
-        - AIR_DAYS - This is a list of integers representing the days of the week (`Monday = 0, ... , Sunday = 6`). This is used for inserting air dates (e.g. `25 Feb`) into the file names.
-        - SEGMENT_MATCHES - This dictionary is used to map out which file corresponds to which show element(e.g. 'Billboard', 'Promo, 'Segment A)
-        - CUT_NUMBERS - This dictionary is used to map the show element to specific cut numbers in ENCO DAD.
-1. The Chooser Class (optional)
-    - The `Chooser` Class is the class that selects which files to download from the FTP. For more specific timeframes, you can inherit from `Chooser` and override the offsets (usually the `first_day_offset`)
-    - Example:
-        ```python
-        class Chooser:
-            ...
-            @property
-            def first_day_offset(self):
-                """ Returns the days to be subtracted from today to reach 
-                the earliest date modified that will be accepted for download. 
-                """
-                # self.weekday is an integer representing the
-                # current day of the week
-                # 0 = Monday, ..., 5 = Saturday, 6 = Sunday
-                return timedelta(days=self.weekday + 1)
-        
-        class Chooser_TAL(Chooser):
-            """ Chooser class for This American Life
-            """
-            # override
-            @property
-            def first_day_offset(self):
-                # This gets Promos uploaded Saturday.
-                return timedelta(days=self.weekday + 2)
-        ```
-
-1. Edit Execution Dictionary (`./modules/coordinate.py`)
-    - the `EXECUTION` dictionary in `coordinate.py` contains information for each show including which classes are needed to fully process the show files.
-    - Example:
-        ```python
-        EXECUTIONS = {
-            'RevealWk': {
-                'show_name': 'Reveal',
-                'chooser': choose.Chooser_Reveal,
-                'processor': process.Reveal,
-                'verifier': verify.Reveal
-            },
-            # each entry into the EXECUTIONS dictionary is of form:
-            ftp_directory_name: {
-                'show_name': show_name,
-                'chooser': choose.Chooser, # default Chooser
-                'processor': process.Show_Process_Class,
-                'verifier': verify.Show_Verification_Class
-            },
-            ...
-        }
-        ```
-    - FTP Directory - add a string matching the remote directory on the PRX FTP server which corresponds to the show
-    - `show_name` - yes.....the name of the show in string form
-    - `chooser` - desired `Chooser` class (default is `choose.Chooser`)
-    - `processor` - desired processing class
-    - `verifier` - The segment length verification class for the show. 
-
-1. Add to a checking class(`./modules/check.py`)
-    - The `Check_BASE` class inherits from the `Process_BASE` class allowing `Check_BASE` to use the same class variables and methods for each show class(e.g. `process.Reveal`, `process.This_American_Life`). 
-    - You will need to add a class for the show by inheriting from both `Check_BASE` and the process class for the show you are adding. For example:
-    ```python
-    class Reveal(Check_BASE, process.Reveal): ...
-    class Latino_USA(Check_BASE, process.Latino_USA): ...
-    ```
-    - Yup, you only the ellipses after it because both classes together have all the methods you will need. 
-    - You will then need to add the class to the `CHECK_SHOWS` list in the check module.
-    ```python
-    CHECK_SHOWS = [
-        Reveal,
-        Latino_USA,
-        Says_You,
-        ...
+### `Show` class instance example for PRX shows:
+```python
+THIS_AMERICAN_LIFE = Show(
+    show_name='This American Life',
+    remote_dir='ThisAmer',
+    number_of_files=5,
+    first_day_offset_offset=2,
+    show_match=['ThisAmer_'],
+    air_days=[5,6],
+    segment_match={
+        'PROM01': 'promo',
+        'PROM02': 'promo_today',
+        'SGMT01': 'segment_a',
+        'SGMT03': 'segment_b',
+        'SGMT02': 'music_bed_a'
+    },
+    cut_numbers={
+        'promo': '25321',
+        'segment_a': '17040',
+        'segment_b': '17042',
+        'music_bed_a': '17041'
+    },
+    timings={
+        '25321': 30,
+        '17041': 60
+    },
+    add_time_target=3480,
+    add=[
+        '17040',
+        '17042'
     ]
-    ```
-1. Add a segment length verification sub-class of `Segment_Verifier` (`./modules.verify`)
-    - the `Segment_Verifier` class is the base class for checking that lengths are correct for the post-processing files meant for the ENCO Dropbox. 
-    - You will need to create a new class that inherits from `Segment_Verifier`
-    ```python
-    class Reveal(Segment_Verifier):
-        TIMINGS = {
-            '17984': 30,
-            '17978': 60,
-            '17980': 60,
-            '17982': 60
-        }
-        ADD_TIME_TARGET = 3060
-        ADD = [
-            '17979',
-            '17981',
-            '17983'
-        ]
-    ```
-    - `TIMINGS` - this is a dictionary that maps the cut numbers to the target time in seconds
-    - `ADD_TIME_TARGET` - this is the target time for the segments that need to be added togther (due to floating breaks)
-    - `ADD` - this is a list of the segments whose lengths will be added together to compare with `ADD_TIME_TARGET`
+)
+```
+- `show_name` - the show name in printable string form
+- `remote_dir` - the directory name for the show on the PRX server
+- `number_of_files` - the full number of files(including promos) that are part of one episode of the show. An assertion error is thrown if there are too many files to prevent processing the wrong files.
+- `first_day_offset_offset` - the number of days prior to Monday in which files for the show will be chosen for download. 
+    - Example: This American Life promos upload on Saturday. Since we want the bot to choose them for download, we allow for files two days before Monday (which is Saturday)
+- `show_match` - a list of strings that are always in the filename of the shows from the PRX server. 
+    - Example: This American Life files always contain `'ThisAmer_'` in the filenames
+        - `ThisAmer_382_SGMT01.wav`
+        - `ThisAmer_383_PROM02.wav`
+        - `ThisAmer_381_SGMT02.wav`
+- `air_days` - a list of integers describing when the show airs.
+    - 4 is for Friday
+    - 5 is for Saturday
+    - 6 is for Sunday.        
+- `segment_match` - this is a dictionary that maps a string matching the segment (e.g. `PROM01`) to the type of segment (e.g. `promo`, or `segment_a`)
+- `cut_numbers` - this is a dictionary that maps the type of segment to the ENCO cut numbers (in string form)
+- `timings` - this dictionary maps the matching cut numbers of an ENCO cut number to the appropriate timing in seconds (if it is a cut whose timing is not checked by adding it to other cuts)
+- `add_target_time` - target time in seconds for segments whose total time is checked for accuracy
+- `add` - a list of the segments whose length in seconds should be added together and compared with `add_time_target`.
 
 ### Adding New Satellite Promos
-For new promos processed from the satellite receiver, only two things need to be changed
+For new promos processed from the satellite receiver, create a new instance of the `Show` class and add it to the `SATELLITE_DATA_LIST` in `./modules/data.py`. Less fields are required than PRX shows.
 
-1. Much like the PRX processing class, you will have to create a new show class in `./modules/satellite_process.py` that inherits from `Process_Satellite_BASE`
-    - Example:
-        ```python
-        class Ask_Me_Another(Process_Satellite_BASE):
-            SHOW_MATCH = ['AskMeA1_']
-            NUMBER_OF_SHOW_FILES = 1
-            AIR_DAYS = [6]
-            SEGMENT_MATCHES = {'SGMT01': 'promo'}
-            CUT_NUMBERS = {'promo': '17020'}
-        ```
-1. Add show to the `SAT_EXEC` dictionary in `./modules/coordinate.py`
-    - Example:
-        ```python
-            SAT_EXEC = {
-                'Ask_Me_Another': {
-                    'show_name': 'Ask Me Another',
-                    'processor': satellite_process.Ask_Me_Another
-                },
-                ...
-            }    
-        ```
+### `Show` class instance example for satellite promos:
+```python
+THROUGHLINE = Show(
+    show_name='Throughline',
+    show_match=['Through1_'],
+    number_of_files=2,
+    air_days=[6],
+    segment_match={'SGMT01': 'promo'},
+    cut_numbers={'promo': '25318'}
+)
+```
+- `show_name` - the show name in printable string form
+- `show_match` - a list of strings that are always in the filename of the shows from the PRX server. 
+    - Example: Throughline promo files always contain `'Through1_'` in the filenames
+- `air_days` - a list of integers describing when the show airs.
+    - 4 is for Friday
+    - 5 is for Saturday
+    - 6 is for Sunday.   
+- `segment_match` - a dictionary mapping a segment matching string to the type of segment
+- `cut_numbers` - a dictionary mapping the segment type to an ENCO cut number (in string form)
+
+

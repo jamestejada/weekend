@@ -1,5 +1,5 @@
 from modules.settings import PATHS
-from modules import choose, satellite_process, verify, process
+from modules import choose, verify, process, satellite_process
 from modules.ftp import connect
 from colorama import Fore, Style
 from modules.download import Download_Files, Sat_Download
@@ -12,7 +12,6 @@ from modules.data import PRX_DATA_LIST, SATELLITE_DATA_LIST
 class Pipe_Control:
     """This class coordinates choosing, downloading and processing
     of various show files."""
-    # EXECUTIONS = EXECUTIONS
     GET_OLDER_FILES = ['RevealWk', 'THEMOTH', 'TheChamb']
     SHOW_LIST = PRX_DATA_LIST
 
@@ -31,6 +30,7 @@ class Pipe_Control:
         self.hash_verifier = verify.Hash_Verifier
         self.segment_verifer = verify.Segment_Verifier
         self.processor = process.Process
+        self.chooser = choose.Chooser
 
         self.logger.info(f'PROCESS ONLY: {self.process_only}')
         self.logger.info(f'THREADING: {self.threading}')
@@ -41,16 +41,16 @@ class Pipe_Control:
 
     # main
     def execute(self):
-        # try:
-        if not self.process_only:
-            self.download_show_files()
-        self.logger.info(f'Files to be Processed: {self.file_process_list}')
-        self.process_files()
-        # except Exception as e:
-        #     print(e)
-        #     self.logger.warn(f'EXCEPTION: {e.__class__.__name__} - {e}')
-        # finally:
-        #     close_logger(self.logger)
+        try:
+            if not self.process_only:
+                self.download_show_files()
+            self.logger.info(f'Files to be Processed: {self.file_process_list}')
+            self.process_files()
+        except Exception as e:
+            print(e)
+            self.logger.warn(f'EXCEPTION: {e.__class__.__name__} - {e}')
+        finally:
+            close_logger(self.logger)
 
     def download_show_files(self):
 
@@ -60,7 +60,6 @@ class Pipe_Control:
         message = 'Connected to FTP' if prx_server else 'Connection could not be established'
         message_level(message)
 
-        # for ftp_dir, pipe_info_dict in self.EXECUTIONS.items():
         for show_data in self.show_data_list:
             print(f'Checking {show_data.remote_dir} on PRX server', end="\r")
             self._process_ftp_dir(prx_server, show_data)
@@ -104,19 +103,16 @@ class Pipe_Control:
     def _choose_files(self, show_data, file_info_generator):
 
         which_file_set = 'old' if show_data.remote_dir in self.GET_OLDER_FILES else 'latest'
-        # chooser_class = self.EXECUTIONS.get(show_data.remote_dir).get('chooser')
-        chooser_class = choose.Chooser
         path_list = self.processor(show_data).file_list
         local_list = [file_path.name for file_path in path_list]
 
-        chooser = chooser_class(
+        file_get_list = self.chooser(
                 file_info_generator=file_info_generator,
                 which_file_set=which_file_set,
                 local_list=local_list,
                 dry_run=self.dry_run,
                 first_day_offset_offset=show_data.first_day_offset_offset
-            )
-        file_get_list = chooser.files_to_get()
+            ).files_to_get()
 
         for each_file in file_get_list:
             self.file_process_list.append(each_file)
@@ -147,8 +143,7 @@ class Pipe_Control:
         """Verifies processed file lengths. If any processed files are not the correct
         length, the files are deleted and reprocessed. 
         """
-        # length_verifier_class = pipe_info.get('verifier')
-        mistimed_files = verify.Segment_Verifier(show_data).verify_show()
+        mistimed_files = self.segment_verifer(show_data).verify_show()
         if mistimed_files:
             self._delete_bad_files(mistimed_files)
             self.logger.warn('Retrying processing')

@@ -88,11 +88,8 @@ class Segment_Verifier:
         mistimed_files = []
         add_segments_list = []
         single_segments_list = []
-        # if not in add, check time
-        # if in add, add and compare files in add_list
-        #   if added files in list are not correct time, add to mistimed files
-        # add all mistimed files to mistimed_files
 
+        # sort into single segments and segments to be added together
         for wav_file in self.PROCESSED_DIR.iterdir():
             cut_number = self._get_cut_number(wav_file)
             if cut_number in self.show_data.timings.keys():
@@ -100,10 +97,12 @@ class Segment_Verifier:
             if cut_number in self.show_data.add:
                 add_segments_list.append(wav_file)
         
+        # check single segments
         for single_file in single_segments_list:
             if not self.is_correct_timing(single_file):
                 mistimed_files.append(single_file)
 
+        # check added together segments
         if not self._is_added_segments_timing_correct(add_segments_list):
             for added_file in add_segments_list:
                 mistimed_files.append(added_file)
@@ -112,7 +111,8 @@ class Segment_Verifier:
 
     def _is_added_segments_timing_correct(self, add_list:list) -> bool:
         if len(add_list) != len(self.show_data.add):
-            # if we don't have all the files, we can't add them all for time
+            # if we don't have all the files,
+            # we can't add them all together for time
             return True
         sum_in_seconds = sum([self._get_length(wav_file) for wav_file in add_list])
         return self.compare_time(self.show_data.add_time_target, sum_in_seconds)
