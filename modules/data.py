@@ -325,6 +325,15 @@ THROUGHLINE = Show(
     cut_numbers={'promo': '25318'}
 )
 
+RADIOLAB = Show(
+    show_name='Radiolab',
+    show_match=['Radiola2_'],
+    number_of_files=2,
+    air_days=[5, 6],
+    segment_match={'SGMT01': 'promo'},
+    cut_numbers={'promo': '67063'}
+)
+
 PRX_DATA_LIST = [
         REVEAL, 
         LATINO_USA, 
@@ -340,5 +349,6 @@ SATELLITE_DATA_LIST = [
         HIDDEN_BRAIN,
         WAIT_WAIT,
         WESUN,
-        THROUGHLINE
+        THROUGHLINE,
+        RADIOLAB
     ]
