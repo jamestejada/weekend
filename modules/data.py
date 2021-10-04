@@ -246,29 +246,32 @@ THIS_AMERICAN_LIFE = Show(
     ]
 )
 
-# THE_CHAMB = Show(
-#     show_name='Chamber Music Society',
-#     remote_dir='TheChamb',
-#     number_of_files=4,
-#     add_time_target=3465,
-#     first_day_offset_offset=0,
-#     show_match=['TheChamb_'],
-#     air_days=[6],
-#     segment_match={
+THE_CHAMB = Show(
+    show_name='Chamber Music Society',
+    remote_dir='TheChamb',
+    number_of_files=4,
+    add_time_target=3465,
+    first_day_offset_offset=0,
+    show_match=['TheChamb_'],
+    air_days=[6],
+    segment_match={
 #         'PROM01': 'promo',
-#         'SGMT01': 'billboard',
-#         'SGMT02': 'segment_a',
-#         'SGMT03': 'segment_b'
-#     },
-#     cut_numbers={
+        'SGMT01': 'billboard',
+        'SGMT02': 'segment_a',
+        'SGMT03': 'segment_b'
+    },
+    cut_numbers={
 #         'promo': '16138',
-#         'billboard': '16135',
-#         'segment_a': '16136',
-#         'segment_b': '16137'
-#     },
-#     timings={'16138': 30,'16135': 45},
-#     add=['16136', '16137']
-# )
+        'billboard': '16135',
+        'segment_a': '16136',
+        'segment_b': '16137'
+    },
+    timings={
+#         '16138': 30,
+        '16135': 45
+    },
+    add=['16136', '16137']
+)
 
 # Satellite
 ITS_BEEN_A_MINUTE = Show(
@@ -337,7 +340,7 @@ RADIOLAB = Show(
 PRX_DATA_LIST = [
         REVEAL, 
         LATINO_USA, 
-        # THE_CHAMB,
+        THE_CHAMB,
         SNAP_JUDGMENT, 
         THE_MOTH, 
         THIS_AMERICAN_LIFE
