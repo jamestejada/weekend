@@ -337,7 +337,7 @@ RADIOLAB = Show(
 PRX_DATA_LIST = [
         REVEAL, 
         LATINO_USA, 
-        THE_CHAMB,
+        # THE_CHAMB,
         SNAP_JUDGMENT, 
         THE_MOTH, 
         THIS_AMERICAN_LIFE
